@@ -1,2 +1,0 @@
-# blazeinsignia
- Bootleg Fire Emblem
