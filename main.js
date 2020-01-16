@@ -6,7 +6,8 @@ var pause = false; //for halting printouts
 var GRID_SIZE = 50;
 
 function setup() {
-	createCanvas(700, 500);
+	var canvas = createCanvas(700, 500);
+	canvas.parent("canvas");
 	cursor1 = new Cursor(0, 0, GRID_SIZE);
 }
 
