@@ -8,7 +8,12 @@ var GRID_SIZE = 50;
 function setup() {
 	var canvas = createCanvas(700, 500);
 	canvas.parent("canvas");
-	cursor1 = new Cursor(0, 0, GRID_SIZE);
+	cursor1 = new Cursor(0, 0, 6, function(xPos, yPos){
+		fill(0, 255, 0, 128);
+		noStroke();
+		//Can add offset to x and y position here if grid is not at 0,0
+		rect(xPos*GRID_SIZE, yPos*GRID_SIZE, GRID_SIZE, GRID_SIZE, GRID_SIZE/4);
+	});
 }
 
 function draw() {
