@@ -1,9 +1,5 @@
-html, body {
-	height: 100%;
-}
-
 body {
-	display: block-inline;
+	display: block;
 }
 
 #header {
@@ -11,8 +7,5 @@ body {
 }
 
 #canvas {
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
+	text-align: center;
 }
