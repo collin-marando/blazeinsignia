@@ -4,10 +4,10 @@
  *           within this timeframe, the cursor rejects input
  * drawFunc: drawing function for cursor
  */
-function Cursor(x, y, moveTime, drawFunc) {
+function Cursor(cursorStart, moveTime, drawFunc) {
 	this.moveTime = moveTime;
 	this.drawFunc = drawFunc;
-	this.goTo(x, y);
+	this.goTo(cursorStart.x, cursorStart.y);
 }
 
 Cursor.prototype.draw = function() {

@@ -1,4 +1,5 @@
 /* Grid Window
+ * gridStart: starting coords for the grid
  * width: visible tile width
  * height: visible tile height
  * drawFunc: drawing function for grid

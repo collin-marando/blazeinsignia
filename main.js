@@ -1,16 +1,17 @@
 //Find another name for cursor if you're going to use the p5 cursor function to make a fuckin sweet flame sword cursor hell yeah dude
 var cursor, grid, data;
 var pause = false; //for halting printouts
+var coverOuter = true;
 
 var TILE_SIZE = 50;
 var BASE_X = 100;
 var BASE_Y = 125;
 var MOVE_TIME = 6;
+var VIEW_BORDER = 1;
 
 function setup() {
 	var canvas = createCanvas(700, 500);
 	canvas.parent("canvas");
-	cursor = new Cursor(0, 0, MOVE_TIME, drawCursor);
 
 	data = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 			[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0],
@@ -23,6 +24,9 @@ function setup() {
 	data.gridStart = {x: 1, y: 1};
 
 	grid = new Grid(data.gridStart, 10, 5, MOVE_TIME, drawGrid);
+
+	data.cursorStart = {x: 1, y:1};
+	cursor = new Cursor(data.cursorStart, MOVE_TIME, drawCursor);
 }
 
 function draw() {
@@ -30,41 +34,22 @@ function draw() {
 		background(155);
 		grid.draw();
 		cursor.draw();
+
+		fill(50);
+		if(coverOuter){
+			rect(0, 0, width, BASE_Y);
+			rect(0, 0, BASE_X, height);
+			rect(BASE_X+grid.width*TILE_SIZE, 0, width, height);
+			rect(0, BASE_Y+grid.height*TILE_SIZE, width, height);
+			fill(255);
+		}
+
+		textSize(32);
+		text("cursor position: " + (cursor.x + grid.x) + ", " + (cursor.y + grid.y), 10, 40);
 	}
 }
 
-function keyPressed() {
-	if (keyCode === UP_ARROW && validIndex(cursor.x, cursor.y-1)){
-		if(cursor.y === 0){
-			grid.moveDown();
-		} else {
-			cursor.moveUp();
-		}
-	} else if (keyCode === DOWN_ARROW && validIndex(cursor.x, cursor.y+1)){
-		if(cursor.y === grid.height-1){
-			grid.moveUp();
-		} else {
-			cursor.moveDown();
-		}
-	} else if (keyCode === LEFT_ARROW && validIndex(cursor.x-1, cursor.y)){
-		if(cursor.x === 0){
-			grid.moveRight()
-		} else {
-			cursor.moveLeft();
-		}
-	} else if (keyCode === RIGHT_ARROW && validIndex(cursor.x+1, cursor.y)){
-		if(cursor.x === grid.width-1){
-			grid.moveLeft()
-		} else {
-			cursor.moveRight();
-		}
-	} else if (key === 'p') {
-		pause = !pause;
-	}
-	console.log(cursor.x + ", " + cursor.y);
-}
-
-//-------------MAP DATA FUNCTIONS-------------
+//--------------MAP FUNCTIONS-------------
 
 function validIndex(x, y){
 	x += grid.x;
@@ -74,6 +59,16 @@ function validIndex(x, y){
 	}
 	return false;
 }
+
+//This function depends on where we want the cursor to land in the window
+//It may be useful to generate padding tiles instead of require them to be hard coded
+//This way, there can be sufficient padding for the cursor to be anchored anywhere
+/*var X_ANCHOR = 3;
+var Y_ANCHOR = 3;
+function goTo(x, y){
+	if(x - X_ANCHOR < 0){x = 0;}
+	console.log(x);
+}*/
 
 //---------------DRAW FUNCTIONS---------------
 
@@ -95,16 +90,82 @@ function drawGrid(xPos, yPos){
 	//draw grid lines
 	stroke(200);
 	strokeWeight(1);
-	for(var x = 1; x < grid.width; x++){
-		line(x*TILE_SIZE+BASE_X, BASE_Y, x*TILE_SIZE+BASE_X, grid.height*TILE_SIZE+BASE_Y);
+	for(var x = 0; x <= grid.width; x++){
+		line((x-xPos+grid.x)*TILE_SIZE+BASE_X, BASE_Y, (x-xPos+grid.x)*TILE_SIZE+BASE_X, grid.height*TILE_SIZE+BASE_Y);
 	}
-	for(var y = 1; y < grid.height; y++){
-		line(BASE_X, y*TILE_SIZE+BASE_Y, grid.width*TILE_SIZE+BASE_X, y*TILE_SIZE+BASE_Y);
+	for(var y = 0; y <= grid.height; y++){
+		line(BASE_X, (y-yPos+grid.y)*TILE_SIZE+BASE_Y, grid.width*TILE_SIZE+BASE_X, (y-yPos+grid.y)*TILE_SIZE+BASE_Y);
 	}
 
-	//draw grid box for conceptual purposes
-	stroke(0);
-	strokeWeight(4);
-	noFill();
-	rect(BASE_X-2, BASE_Y-2, grid.width*TILE_SIZE+4, grid.height*TILE_SIZE+4);
+	if(!coverOuter){
+		//draw view border for conceptual purposes
+		stroke(0);
+		strokeWeight(4);
+		noFill();
+		rect(BASE_X-2, BASE_Y-2, grid.width*TILE_SIZE+4, grid.height*TILE_SIZE+4);
+
+		//draw move border for conceptual purposes
+		stroke(10, 10, 10, 100);
+		strokeWeight(4);
+		noFill();
+		rect(BASE_X+VIEW_BORDER*TILE_SIZE, BASE_Y+VIEW_BORDER*TILE_SIZE, (grid.width-VIEW_BORDER*2)*TILE_SIZE, (grid.height-VIEW_BORDER*2)*TILE_SIZE);
+	}
+}
+
+//--------------------KEY INPUT---------------------
+
+function keyPressed() {
+	if (keyCode === UP_ARROW && validIndex(cursor.x, cursor.y-1)){
+		if(cursor.y === VIEW_BORDER){
+			grid.moveDown();
+		} else {
+			cursor.moveUp();
+		}
+	} else if (keyCode === DOWN_ARROW && validIndex(cursor.x, cursor.y+1)){
+		if(cursor.y === grid.height-1-VIEW_BORDER){
+			grid.moveUp();
+		} else {
+			cursor.moveDown();
+		}
+	} else if (keyCode === LEFT_ARROW && validIndex(cursor.x-1, cursor.y)){
+		if(cursor.x === VIEW_BORDER){
+			grid.moveRight()
+		} else {
+			cursor.moveLeft();
+		}
+	} else if (keyCode === RIGHT_ARROW && validIndex(cursor.x+1, cursor.y)){
+		if(cursor.x === grid.width-1-VIEW_BORDER){
+			grid.moveLeft()
+		} else {
+			cursor.moveRight();
+		}
+	} else if (key === 'p') {
+		pause = !pause;
+	} else if (key === 'c') {
+		coverOuter = !coverOuter;
+	}
+}
+
+//--------------------MOUSE INPUT---------------------
+
+function canvasCoordsToWindowIndex(x, y){
+	if(x >= BASE_X && x < BASE_X+grid.width*TILE_SIZE && y >= BASE_Y && y < BASE_Y+grid.width*TILE_SIZE){
+		x = int((x-BASE_X)/TILE_SIZE);
+		y = int((y-BASE_Y)/TILE_SIZE);
+		return {x: x, y: y};
+	}
+	return undefined;
+}
+
+//Only return defined results for map items within window
+function canvasCoordsToMapIndex(x, y){
+	var index = canvasCoordsToWindowIndex(x, y);
+	if(typeof index === "undefined"){return undefined;}
+	index.x += grid.x;
+	index.y += grid.y;
+	return index;
+}
+
+function mouseClicked(){
+	console.log(canvasCoordsToMapIndex(mouseX, mouseY));
 }
