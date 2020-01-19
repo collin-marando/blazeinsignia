@@ -1,40 +1,61 @@
-/* data: cell data for the entire map
+/* Grid Window
  * width: visible tile width
  * height: visible tile height
  * drawFunc: drawing function for grid
  */
-function Grid(data, width, height, drawFunc){
-	this.data = data; //Not necessary on init, maybe just make a load func and take this out
+function Grid(gridStart, width, height, moveTime, drawFunc){
 	this.width = width;
 	this.height = height;
+	this.moveTime = moveTime;
 	this.drawFunc = drawFunc;
+	this.goTo(gridStart.x, gridStart.y);
 }
 
 Grid.prototype.draw = function(){
-	this.drawFunc();
-}
+	var xPos = this.x;
+	var yPos = this.y;
+	if(this.timer){
+		xPos += (this.prevx-this.x)*(this.timer/this.moveTime);
+		yPos += (this.prevy-this.y)*(this.timer/this.moveTime);
 
-Grid.prototype.validIndex = function(x, y){
-	//if coords are not out of index
-	if(x >= 0 && x < this.data[0].length && y >= 0 && y < this.data.length){
-		//if coords represent a playable tile
-		return this.data[y][x] == 1;
+		this.timer--;
+		if(this.timer == 0){
+			this.prevx = this.x;
+			this.prevy = this.y;
+		}
 	}
-	return false;
+
+	this.drawFunc(xPos, yPos);
 }
 
-Grid.prototype.MoveUp = function(){
-	
+Grid.prototype.goTo = function(x, y){
+	this.x = x;
+	this.y = y;
+	this.prevx = x;
+	this.prevy = y;
+	this.timer = 0;
 }
 
-Grid.prototype.MoveDown = function(){
-	
+Grid.prototype.moveUp = function() {
+	if(this.timer){return;}
+	this.y++;
+	this.timer = this.moveTime;
 }
 
-Grid.prototype.MoveLeft = function(){
-	
+Grid.prototype.moveDown = function() {
+	if(this.timer){return;}
+	this.y--;
+	this.timer = this.moveTime;
 }
 
-Grid.prototype.MoveRight = function(){
-	
+Grid.prototype.moveLeft = function() {
+	if(this.timer){return;}
+	this.x++;
+	this.timer = this.moveTime;
+}
+
+Grid.prototype.moveRight = function() {
+	if(this.timer){return;}
+	this.x--;
+	this.timer = this.moveTime;
 }
