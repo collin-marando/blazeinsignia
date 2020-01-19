@@ -15,7 +15,12 @@ Grid.prototype.draw = function(){
 }
 
 Grid.prototype.validIndex = function(x, y){
-
+	//if coords are not out of index
+	if(x >= 0 && x < this.data[0].length && y >= 0 && y < this.data.length){
+		//if coords represent a playable tile
+		return this.data[y][x] == 1;
+	}
+	return false;
 }
 
 Grid.prototype.MoveUp = function(){
