@@ -45,15 +45,13 @@ function draw() {
 		}
 
 		textSize(32);
-		text("cursor position: " + (cursor.x + grid.x) + ", " + (cursor.y + grid.y), 10, 40);
+		text("cursor map location: " + (cursor.x + grid.x) + ", " + (cursor.y + grid.y), 10, 40);
 	}
 }
 
 //--------------MAP FUNCTIONS-------------
 
 function validIndex(x, y){
-	x += grid.x;
-	y += grid.y;
 	if(x >= 0 && x < this.data[0].length && y >= 0 && y < this.data.length){
 		return this.data[y][x] == 1;
 	}
@@ -63,12 +61,15 @@ function validIndex(x, y){
 //This function depends on where we want the cursor to land in the window
 //It may be useful to generate padding tiles instead of require them to be hard coded
 //This way, there can be sufficient padding for the cursor to be anchored anywhere
-/*var X_ANCHOR = 3;
-var Y_ANCHOR = 3;
-function goTo(x, y){
-	if(x - X_ANCHOR < 0){x = 0;}
-	console.log(x);
-}*/
+var X_ANCHOR = 2;
+var Y_ANCHOR = 2;
+function goTo(x,y){
+	console.log(x+","+y);
+	if(validIndex(x,y)){
+		grid.goTo(x-X_ANCHOR,y-Y_ANCHOR);
+		cursor.goTo(X_ANCHOR, Y_ANCHOR);
+	}
+}
 
 //---------------DRAW FUNCTIONS---------------
 
@@ -115,25 +116,25 @@ function drawGrid(xPos, yPos){
 //--------------------KEY INPUT---------------------
 
 function keyPressed() {
-	if (keyCode === UP_ARROW && validIndex(cursor.x, cursor.y-1)){
+	if (keyCode === UP_ARROW && validIndex(cursor.x+grid.x, cursor.y+grid.y-1)){
 		if(cursor.y === VIEW_BORDER){
 			grid.moveDown();
 		} else {
 			cursor.moveUp();
 		}
-	} else if (keyCode === DOWN_ARROW && validIndex(cursor.x, cursor.y+1)){
+	} else if (keyCode === DOWN_ARROW && validIndex(cursor.x+grid.x, cursor.y+grid.y+1)){
 		if(cursor.y === grid.height-1-VIEW_BORDER){
 			grid.moveUp();
 		} else {
 			cursor.moveDown();
 		}
-	} else if (keyCode === LEFT_ARROW && validIndex(cursor.x-1, cursor.y)){
+	} else if (keyCode === LEFT_ARROW && validIndex(cursor.x+grid.x-1, cursor.y+grid.y)){
 		if(cursor.x === VIEW_BORDER){
 			grid.moveRight()
 		} else {
 			cursor.moveLeft();
 		}
-	} else if (keyCode === RIGHT_ARROW && validIndex(cursor.x+1, cursor.y)){
+	} else if (keyCode === RIGHT_ARROW && validIndex(cursor.x+grid.x+1, cursor.y+grid.y)){
 		if(cursor.x === grid.width-1-VIEW_BORDER){
 			grid.moveLeft()
 		} else {
@@ -167,5 +168,7 @@ function canvasCoordsToMapIndex(x, y){
 }
 
 function mouseClicked(){
-	console.log(canvasCoordsToMapIndex(mouseX, mouseY));
+	var index = canvasCoordsToMapIndex(mouseX, mouseY);
+	console.log(index)
+	goTo(index.x, index.y);
 }

@@ -28,11 +28,11 @@ Cursor.prototype.draw = function() {
 }
 
 Cursor.prototype.goTo = function(x, y){
+	//Goto should probably run on the fastMove timer once I have it
+	if(this.timer){return;}
 	this.x = x;
 	this.y = y;
-	this.prevx = x;
-	this.prevy = y;
-	this.timer = 0;
+	this.timer = this.moveTime;
 }
 
 Cursor.prototype.moveUp = function() {
