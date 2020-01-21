@@ -4,10 +4,11 @@
  *           within this timeframe, the cursor rejects input
  * drawFunc: drawing function for cursor
  */
-function Cursor(cursorStart, moveTime, drawFunc) {
+function Cursor(cursorStart, moveTime, drawFunc, spamLock) {
 	this.moveTime = moveTime;
 	this.drawFunc = drawFunc;
 	this.goTo(cursorStart.x, cursorStart.y);
+	this.spamLock;
 }
 
 Cursor.prototype.draw = function() {
@@ -28,6 +29,7 @@ Cursor.prototype.draw = function() {
 }
 
 Cursor.prototype.goTo = function(x, y, fast){
+	if(this.spamLock && this.timer){return;}
 	this.x = x;
 	this.y = y;
 	this.prevx = this.currPosX;
