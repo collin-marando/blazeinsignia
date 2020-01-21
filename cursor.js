@@ -11,11 +11,11 @@ function Cursor(cursorStart, moveTime, drawFunc) {
 }
 
 Cursor.prototype.draw = function() {
-	var xPos = this.x;
-	var yPos = this.y;
+	this.currPosX = this.x;
+	this.currPosY = this.y;
 	if(this.timer){
-		xPos += (this.prevx-this.x)*(this.timer/this.moveTime);
-		yPos += (this.prevy-this.y)*(this.timer/this.moveTime);
+		this.currPosX += (this.prevx-this.x)*(this.timer/this.moveTime);
+		this.currPosY += (this.prevy-this.y)*(this.timer/this.moveTime);
 
 		this.timer--;
 		if(this.timer == 0){
@@ -24,37 +24,29 @@ Cursor.prototype.draw = function() {
 		}
 	}
 
-	this.drawFunc(xPos, yPos);
+	this.drawFunc(this.currPosX, this.currPosY);
 }
 
-Cursor.prototype.goTo = function(x, y){
-	//Goto should probably run on the fastMove timer once I have it
-	if(this.timer){return;}
+Cursor.prototype.goTo = function(x, y, fast){
 	this.x = x;
 	this.y = y;
-	this.timer = this.moveTime;
+	this.prevx = this.currPosX;
+	this.prevy = this.currPosY;
+	this.timer = fast ? this.moveTime*2 : this.moveTime;
 }
 
 Cursor.prototype.moveUp = function() {
-	if(this.timer){return;}
-	this.y--;
-	this.timer = this.moveTime;
+	this.goTo(this.x, this.y-1);
 }
 
 Cursor.prototype.moveDown = function() {
-	if(this.timer){return;}
-	this.y++;
-	this.timer = this.moveTime;
+	this.goTo(this.x, this.y+1);
 }
 
 Cursor.prototype.moveLeft = function() {
-	if(this.timer){return;}
-	this.x--;
-	this.timer = this.moveTime;
+	this.goTo(this.x-1, this.y);
 }
 
 Cursor.prototype.moveRight = function() {
-	if(this.timer){return;}
-	this.x++;
-	this.timer = this.moveTime;
+	this.goTo(this.x+1, this.y);
 }
