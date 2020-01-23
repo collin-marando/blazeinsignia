@@ -6,7 +6,7 @@ var coverOuter = true;
 var TILE_SIZE = 50;
 var BASE_X = 100;
 var BASE_Y = 125;
-var MOVE_TIME = 6;
+var MOVE_TIME = 4;
 var VIEW_BORDER = 1;
 
 function setup() {
@@ -169,5 +169,5 @@ function canvasCoordsToMapIndex(x, y){
 function mouseClicked(){
 	var index = canvasCoordsToMapIndex(mouseX, mouseY);
 	console.log(index)
-	goTo(index.x, index.y);
+	if(index){goTo(index.x, index.y)};
 }

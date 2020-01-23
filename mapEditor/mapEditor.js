@@ -13,7 +13,7 @@ function setup() {
 	var canvas = createCanvas(900, 720);
 	canvas.parent("canvas");
 
-	data = Array(20).fill().map(() => Array(20).fill(0));
+	data = [[]];
 	tileData = Array(2).fill().map(() => Array(15).fill(0));
 	var zz = {x: 0, y: 0};
 
@@ -25,8 +25,8 @@ function setup() {
 function draw() {
 	if(!pause){
 		background(155);
-		grid.draw();
 		tileBar.draw();
+		grid.draw();
 		cursor.draw();
 	}
 }
@@ -34,12 +34,7 @@ function draw() {
 //--------------MAP FUNCTIONS-------------
 
 function validIndex(x, y){
-	console.log(x + ',' + y);
-	if(x >= 0 && x < grid.width && y >= 0 && y < grid.height){
-		console.log("wtf")
-		return true;
-	}
-	return false;
+	return x >= 0 && x < grid.width && y >= 0 && y < grid.height;
 }
 
 //---------------DRAW FUNCTIONS---------------
@@ -168,5 +163,5 @@ function canvasCoordsToMapIndex(x, y){
 function mouseClicked(){
 	var index = canvasCoordsToMapIndex(mouseX, mouseY);
 	console.log(index)
-	cursor.goTo(index.x, index.y);
+	if(index){cursor.goTo(index.x, index.y)};
 }
