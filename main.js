@@ -64,7 +64,6 @@ function validIndex(x, y){
 var X_ANCHOR = 2;
 var Y_ANCHOR = 2;
 function goTo(x,y){
-	console.log(x+","+y);
 	if(validIndex(x,y)){
 		grid.goTo(x-X_ANCHOR,y-Y_ANCHOR);
 		cursor.goTo(X_ANCHOR, Y_ANCHOR);
