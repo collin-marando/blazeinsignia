@@ -28,7 +28,7 @@ Cursor.prototype.draw = function() {
 }
 
 Cursor.prototype.goTo = function(x, y){
-	if(this.timer){return;}
+	//if(this.timer){return;}
 	this.x = x;
 	this.y = y;
 	this.prevx = this.currPosX;
