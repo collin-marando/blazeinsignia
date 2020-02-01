@@ -7,6 +7,7 @@ var TILE_SIZE = 50;
 var BASE_X = 100;
 var BASE_Y = 125;
 var MOVE_TIME = 4;
+var HOLD_TIME = 12;
 var VIEW_BORDER = 1;
 
 function setup() {
@@ -46,6 +47,8 @@ function draw() {
 
 		textSize(32);
 		text("cursor map location: " + (cursor.x + grid.x) + ", " + (cursor.y + grid.y), 10, 40);
+
+		checkHeldKeys();
 	}
 }
 
@@ -61,14 +64,57 @@ function validIndex(x, y){
 //This function depends on where we want the cursor to land in the window
 //It may be useful to generate padding tiles instead of require them to be hard coded
 //This way, there can be sufficient padding for the cursor to be anchored anywhere
-var X_ANCHOR = 2;
-var Y_ANCHOR = 2;
+var X_ANCHOR = 1;
+var Y_ANCHOR = 1;
 function goTo(x,y){
 	if(validIndex(x,y)){
 		grid.goTo(x-X_ANCHOR,y-Y_ANCHOR);
 		cursor.goTo(X_ANCHOR, Y_ANCHOR);
 	}
 }
+
+//---------------MOVE FUNCTIONS---------------
+
+function moveUp(){
+	if(validIndex(cursor.x+grid.x, cursor.y+grid.y-1)){
+		if(cursor.y === VIEW_BORDER){
+			grid.moveDown();
+		} else {
+			cursor.moveUp();
+		}
+	}
+}
+
+function moveDown(){
+	if(validIndex(cursor.x+grid.x, cursor.y+grid.y+1)){
+		if(cursor.y === grid.height-1-VIEW_BORDER){
+			grid.moveUp();
+		} else {
+			cursor.moveDown();
+		}
+	}
+}
+
+function moveLeft(){
+	if(validIndex(cursor.x+grid.x-1, cursor.y+grid.y)){
+		if(cursor.x === VIEW_BORDER){
+			grid.moveRight()
+		} else {
+			cursor.moveLeft();
+		}
+	}
+}
+
+function moveRight(){
+	if(validIndex(cursor.x+grid.x+1, cursor.y+grid.y)){
+		if(cursor.x === grid.width-1-VIEW_BORDER){
+			grid.moveLeft()
+		} else {
+			cursor.moveRight();
+		}
+	}
+}
+
 
 //---------------DRAW FUNCTIONS---------------
 
@@ -97,14 +143,13 @@ function drawGrid(xPos, yPos){
 		line(BASE_X, (y-yPos+grid.y)*TILE_SIZE+BASE_Y, grid.width*TILE_SIZE+BASE_X, (y-yPos+grid.y)*TILE_SIZE+BASE_Y);
 	}
 
+	//draw view and move borders for conceptual purposes
 	if(!coverOuter){
-		//draw view border for conceptual purposes
 		stroke(0);
 		strokeWeight(4);
 		noFill();
 		rect(BASE_X-2, BASE_Y-2, grid.width*TILE_SIZE+4, grid.height*TILE_SIZE+4);
 
-		//draw move border for conceptual purposes
 		stroke(10, 10, 10, 100);
 		strokeWeight(4);
 		noFill();
@@ -114,37 +159,68 @@ function drawGrid(xPos, yPos){
 
 //--------------------KEY INPUT---------------------
 
+var holdTimer = HOLD_TIME;
+var heldKey = {x: "none", y: "none"};
 function keyPressed() {
-	if (keyCode === UP_ARROW && validIndex(cursor.x+grid.x, cursor.y+grid.y-1)){
-		if(cursor.y === VIEW_BORDER){
-			grid.moveDown();
-		} else {
-			cursor.moveUp();
-		}
-	} else if (keyCode === DOWN_ARROW && validIndex(cursor.x+grid.x, cursor.y+grid.y+1)){
-		if(cursor.y === grid.height-1-VIEW_BORDER){
-			grid.moveUp();
-		} else {
-			cursor.moveDown();
-		}
-	} else if (keyCode === LEFT_ARROW && validIndex(cursor.x+grid.x-1, cursor.y+grid.y)){
-		if(cursor.x === VIEW_BORDER){
-			grid.moveRight()
-		} else {
-			cursor.moveLeft();
-		}
-	} else if (keyCode === RIGHT_ARROW && validIndex(cursor.x+grid.x+1, cursor.y+grid.y)){
-		if(cursor.x === grid.width-1-VIEW_BORDER){
-			grid.moveLeft()
-		} else {
-			cursor.moveRight();
-		}
+	if (keyCode === UP_ARROW){
+		holdTimer = HOLD_TIME;
+		heldKey.y = "up";
+		moveUp();
+	} else if (keyCode === DOWN_ARROW){
+		holdTimer = HOLD_TIME;
+		heldKey.y = "down";
+		moveDown();
+	} else if (keyCode === LEFT_ARROW){
+		holdTimer = HOLD_TIME;
+		heldKey.x = "left";
+		moveLeft();
+	} else if (keyCode === RIGHT_ARROW){
+		holdTimer = HOLD_TIME;
+		heldKey.x = "right";
+		moveRight();
 	} else if (key === 'p') {
 		pause = !pause;
 	} else if (key === 'c') {
 		coverOuter = !coverOuter;
 	}
 }
+
+function keyReleased(){
+	//TO DO: if opposite direction takes over, timer should be reset first
+	if (keyCode === UP_ARROW){
+		heldKey.y = keyIsDown(DOWN_ARROW)? "down": "none";
+
+	} else if (keyCode === DOWN_ARROW){
+		heldKey.y = keyIsDown(UP_ARROW)? "up": "none";
+
+	} else if (keyCode === LEFT_ARROW){
+		heldKey.x = keyIsDown(RIGHT_ARROW)? "right": "none";
+
+	} else if (keyCode === RIGHT_ARROW){
+		heldKey.x = keyIsDown(LEFT_ARROW)? "left": "none";
+	}
+}
+
+function checkHeldKeys(){
+	holdTimer = holdTimer > 0 ? holdTimer-1 : 0; //dec timer if positive
+	if (cursor.timer == 0 && grid.timer == 0){
+		if (holdTimer == 0){
+			if (heldKey.y == "up"){
+				moveUp();
+			} else if (heldKey.y == "down"){
+				moveDown();
+			}
+			
+			if (heldKey.x == "left"){
+				moveLeft();
+			} else if (heldKey.x == "right"){
+				moveRight();
+			}
+		}
+	}
+}
+
+
 
 //--------------------MOUSE INPUT---------------------
 
