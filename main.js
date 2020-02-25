@@ -225,7 +225,7 @@ function checkHeldKeys(){
 //--------------------MOUSE INPUT---------------------
 
 function canvasCoordsToWindowIndex(x, y){
-	if(x >= BASE_X && x < BASE_X+grid.width*TILE_SIZE && y >= BASE_Y && y < BASE_Y+grid.width*TILE_SIZE){
+	if(x >= BASE_X && x < BASE_X+grid.width*TILE_SIZE && y >= BASE_Y && y < BASE_Y+grid.height*TILE_SIZE){
 		x = int((x-BASE_X)/TILE_SIZE);
 		y = int((y-BASE_Y)/TILE_SIZE);
 		return {x: x, y: y};
