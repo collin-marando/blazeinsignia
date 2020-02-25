@@ -1,9 +1,11 @@
-//Find another name for cursor if you're going to use the p5 cursor function to make a fuckin sweet flame sword cursor hell yeah dude
-var cursor, map, mapData;
+var cursor, map, mapData, bar, barData;
 var pause = false; //for halting printouts
 
-var MAP_TILE_SIZE = 30;
 var BAR_TILE_SIZE = 50;
+var BAR_BASE_X = 0;
+var BAR_BASE_Y = 0;
+
+var MAP_TILE_SIZE = 30;
 var MAP_BASE_X = 0;
 var MAP_BASE_Y = 70;
 
@@ -19,14 +21,14 @@ function setup() {
 	var zz = {x: 0, y: 0};
 
 	map = new Grid(zz, 30, 20, MOVE_TIME, drawGrid);
-	tileBar = new Grid(zz, 18, 1, MOVE_TIME, drawTileBar);
+	bar = new Grid(zz, 18, 1, MOVE_TIME, drawTileBar);
 	cursor = new Cursor(zz, MOVE_TIME, drawCursor);
 }
 
 function draw() {
 	if(!pause){
 		background(155);
-		tileBar.draw();
+		bar.draw();
 		map.draw();
 		cursor.draw();
 	}
@@ -78,20 +80,20 @@ function drawGrid(xPos, yPos){
 }
 
 function drawTileBar(xPos, yPos){
-	//draw tileBar tiles
+	//draw bar tiles
 	for(var i = 0; i < barData.length; i++){
 		fill(barData[i].color);
 		rect((i-xPos)*BAR_TILE_SIZE, 0, BAR_TILE_SIZE, BAR_TILE_SIZE);
 	}
 	
-	//draw tileBar lines
+	//draw bar lines
 	stroke(200);
 	strokeWeight(1);
-	for(var x = 0; x <= tileBar.width; x++){
-		line((x-xPos+tileBar.x)*BAR_TILE_SIZE, 0, (x-xPos+tileBar.x)*BAR_TILE_SIZE, tileBar.height*BAR_TILE_SIZE);
+	for(var x = 0; x <= bar.width; x++){
+		line((x-xPos+bar.x)*BAR_TILE_SIZE, 0, (x-xPos+bar.x)*BAR_TILE_SIZE, bar.height*BAR_TILE_SIZE);
 	}
-	for(var y = 0; y <= tileBar.height; y++){
-		line(0, (y-yPos+tileBar.y)*BAR_TILE_SIZE, tileBar.width*BAR_TILE_SIZE, (y-yPos+tileBar.y)*BAR_TILE_SIZE);
+	for(var y = 0; y <= bar.height; y++){
+		line(0, (y-yPos+bar.y)*BAR_TILE_SIZE, bar.width*BAR_TILE_SIZE, (y-yPos+bar.y)*BAR_TILE_SIZE);
 	}
 
 }
@@ -151,26 +153,22 @@ function keyPressed() {
 
 //--------------------MOUSE INPUT---------------------
 
-function canvasCoordsToWindowIndex(x, y){
-	if(x >= MAP_BASE_X && x < MAP_BASE_X+map.width*MAP_TILE_SIZE && y >= MAP_BASE_Y && y < MAP_BASE_Y+map.width*MAP_TILE_SIZE){
-		x = int((x-MAP_BASE_X)/MAP_TILE_SIZE);
-		y = int((y-MAP_BASE_Y)/MAP_TILE_SIZE);
-		return {x: x, y: y};
+function canvasCoordsToIndex(x, y){
+	if(x >= BAR_BASE_X && x < BAR_BASE_X+bar.width*BAR_TILE_SIZE && y >= BAR_BASE_Y && y < BAR_BASE_Y+bar.height*BAR_TILE_SIZE){
+		x = int((x-BAR_BASE_X)/BAR_TILE_SIZE)+bar.x;
+		y = int((y-BAR_BASE_Y)/BAR_TILE_SIZE)+bar.y;
+		return {selection: "bar", x: x, y: y};
+
+	} else if(x >= MAP_BASE_X && x < MAP_BASE_X+map.width*MAP_TILE_SIZE && y >= MAP_BASE_Y && y < MAP_BASE_Y+map.height*MAP_TILE_SIZE){
+		x = int((x-MAP_BASE_X)/MAP_TILE_SIZE)+map.x;
+		y = int((y-MAP_BASE_Y)/MAP_TILE_SIZE)+map.y;
+		return {selection: "map", x: x, y: y};
 	}
 	return undefined;
 }
 
-//Only return defined results for map items within window
-function canvasCoordsToMapIndex(x, y){
-	var index = canvasCoordsToWindowIndex(x, y);
-	if(typeof index === "undefined"){return undefined;}
-	index.x += map.x;
-	index.y += map.y;
-	return index;
-}
-
 function mouseClicked(){
-	var index = canvasCoordsToMapIndex(mouseX, mouseY);
+	var index = canvasCoordsToIndex(mouseX, mouseY);
 	console.log(index)
-	if(index){cursor.goTo(index.x, index.y)};
+	if(index && index.selection == "map"){cursor.goTo(index.x, index.y)};
 }
