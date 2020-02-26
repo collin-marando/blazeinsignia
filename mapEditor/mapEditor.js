@@ -73,9 +73,11 @@ function drawBarCursor(xPos, yPos){
 
 function drawGrid(xPos, yPos){
 	//draw map tiles
-	for(var i = 0; i < mapData[0].length; i++){
-		for(var j = 0; j < mapData.length; j++){
-			mapData[j][i] ? fill(80, 133, 217) : fill(232, 67, 95);
+	for(var j = 0; j < mapData.length; j++){
+		if(!mapData[j]){continue;}
+		for(var i = 0; i < mapData[j].length; i++){
+			if(!mapData[j][i]){continue;}
+			fill(mapData[j][i].color);
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
 		}
 	}
@@ -182,6 +184,13 @@ function canvasCoordsToIndex(x, y){
 function mouseClicked(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	console.log(index)
-	if(index && index.selection == "bar"){barCursor.goTo(index.x, index.y)};
-	if(index && index.selection == "map"){mapCursor.goTo(index.x, index.y)};
+	if(index && index.selection == "bar" && index.x < barData.length){
+		barCursor.goTo(index.x, index.y);
+	} else if(index && index.selection == "map"){
+		mapCursor.goTo(index.x, index.y)
+		if(!mapData[index.y]){
+			mapData[index.y] = [];
+		}
+		mapData[index.y][index.x] = JSON.parse(JSON.stringify(barData[barCursor.x]));
+	}
 }
