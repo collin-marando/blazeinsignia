@@ -1,4 +1,4 @@
-var cursor, map, mapData, bar, barData;
+var mapCursor, map, mapData, barCursor, bar, barData;
 var pause = false; //for halting printouts
 
 var BAR_TILE_SIZE = 50;
@@ -18,11 +18,12 @@ function setup() {
 
 	mapData = [[]];
 	barData = createBarAssets();
-	var zz = {x: 0, y: 0};
 
-	map = new Grid(zz, 30, 20, MOVE_TIME, drawGrid);
-	bar = new Grid(zz, 18, 1, MOVE_TIME, drawTileBar);
-	cursor = new Cursor(zz, MOVE_TIME, drawCursor);
+	map = new Grid({x: 0, y: 0}, 30, 20, MOVE_TIME, drawGrid);
+	bar = new Grid({x: 0, y: 0}, 18, 1, MOVE_TIME, drawTileBar);
+
+	mapCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawMapCursor);
+	barCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawBarCursor);
 }
 
 function draw() {
@@ -30,7 +31,8 @@ function draw() {
 		background(155);
 		bar.draw();
 		map.draw();
-		cursor.draw();
+		barCursor.draw();
+		mapCursor.draw();
 	}
 }
 
@@ -52,10 +54,21 @@ function validIndex(x, y){
 
 //---------------DRAW FUNCTIONS---------------
 
-function drawCursor(xPos, yPos){
-	fill(0, 255, 0, 128);
-	noStroke();
-	rect(xPos*MAP_TILE_SIZE+MAP_BASE_X, yPos*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE, MAP_TILE_SIZE/4);
+function drawMapCursor(xPos, yPos){
+	stroke(100);
+	strokeWeight(2);
+	var left = xPos*MAP_TILE_SIZE+MAP_BASE_X;
+	var top = yPos*MAP_TILE_SIZE+MAP_BASE_Y; 
+	line(left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.75);
+	line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.5, left+MAP_TILE_SIZE*0.75, top+MAP_TILE_SIZE*0.5);
+}
+
+function drawBarCursor(xPos, yPos){
+	stroke(100);
+	strokeWeight(1);
+	var left = xPos*BAR_TILE_SIZE+BAR_BASE_X;
+	var top = yPos*BAR_TILE_SIZE+BAR_BASE_Y; 
+	line(left, top, left+BAR_TILE_SIZE, top+BAR_TILE_SIZE);
 }
 
 function drawGrid(xPos, yPos){
@@ -87,7 +100,7 @@ function drawTileBar(xPos, yPos){
 	}
 	
 	//draw bar lines
-	stroke(200);
+	stroke(100);
 	strokeWeight(1);
 	for(var x = 0; x <= bar.width; x++){
 		line((x-xPos+bar.x)*BAR_TILE_SIZE, 0, (x-xPos+bar.x)*BAR_TILE_SIZE, bar.height*BAR_TILE_SIZE);
@@ -101,48 +114,47 @@ function drawTileBar(xPos, yPos){
 //--------------------MOVEMENT---------------------
 
 function moveUp(){
-	if(cursor.y === VIEW_BORDER){
+	if(mapCursor.y === VIEW_BORDER){
 		map.moveDown();
 	} else {
-		cursor.moveUp();
+		mapCursor.moveUp();
 	}
 }
 
 function moveDown(){
-	if(cursor.y === map.height-1-VIEW_BORDER){
+	if(mapCursor.y === map.height-1-VIEW_BORDER){
 		map.moveUp();
 	} else {
-		cursor.moveDown();
+		mapCursor.moveDown();
 	}
 }
 
 function moveLeft(){
-	if(cursor.x === VIEW_BORDER){
+	if(mapCursor.x === VIEW_BORDER){
 		map.moveRight()
 	} else {
-		cursor.moveLeft();
+		mapCursor.moveLeft();
 	}
 }
 
 function moveRight(){
-	if(cursor.x === map.width-1-VIEW_BORDER){
+	if(mapCursor.x === map.width-1-VIEW_BORDER){
 		map.moveLeft()
 	} else {
-		cursor.moveRight();
+		mapCursor.moveRight();
 	}
 }
-
 
 //--------------------KEY INPUT---------------------
 
 function keyPressed() {
-	if (keyCode === UP_ARROW && validIndex(cursor.x+map.x, cursor.y+map.y-1)){
+	if (keyCode === UP_ARROW && validIndex(mapCursor.x+map.x, mapCursor.y+map.y-1)){
 		moveUp();
-	} else if (keyCode === DOWN_ARROW && validIndex(cursor.x+map.x, cursor.y+map.y+1)){
+	} else if (keyCode === DOWN_ARROW && validIndex(mapCursor.x+map.x, mapCursor.y+map.y+1)){
 		moveDown();
-	} else if (keyCode === LEFT_ARROW && validIndex(cursor.x+map.x-1, cursor.y+map.y)){
+	} else if (keyCode === LEFT_ARROW && validIndex(mapCursor.x+map.x-1, mapCursor.y+map.y)){
 		moveLeft();
-	} else if (keyCode === RIGHT_ARROW && validIndex(cursor.x+map.x+1, cursor.y+map.y)){
+	} else if (keyCode === RIGHT_ARROW && validIndex(mapCursor.x+map.x+1, mapCursor.y+map.y)){
 		moveRight();
 	} else if (key === 'p') {
 		pause = !pause;
@@ -170,5 +182,6 @@ function canvasCoordsToIndex(x, y){
 function mouseClicked(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	console.log(index)
-	if(index && index.selection == "map"){cursor.goTo(index.x, index.y)};
+	if(index && index.selection == "bar"){barCursor.goTo(index.x, index.y)};
+	if(index && index.selection == "map"){mapCursor.goTo(index.x, index.y)};
 }
