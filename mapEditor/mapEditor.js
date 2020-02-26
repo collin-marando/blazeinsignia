@@ -52,6 +52,17 @@ function validIndex(x, y){
 	return x >= 0 && x < map.width && y >= 0 && y < map.height;
 }
 
+function placeTile(x, y){
+	if(!x && !y){
+		x = mapCursor.x;
+		y = mapCursor.y;
+	}
+	if(!mapData[y]){
+		mapData[y] = [];
+	}
+	mapData[y][x] = JSON.parse(JSON.stringify(barData[barCursor.x]));
+}
+
 //---------------DRAW FUNCTIONS---------------
 
 function drawMapCursor(xPos, yPos){
@@ -65,7 +76,7 @@ function drawMapCursor(xPos, yPos){
 
 function drawBarCursor(xPos, yPos){
 	stroke(100);
-	strokeWeight(1);
+	strokeWeight(2);
 	var left = xPos*BAR_TILE_SIZE+BAR_BASE_X;
 	var top = yPos*BAR_TILE_SIZE+BAR_BASE_Y; 
 	line(left, top, left+BAR_TILE_SIZE, top+BAR_TILE_SIZE);
@@ -150,18 +161,26 @@ function moveRight(){
 //--------------------KEY INPUT---------------------
 
 function keyPressed() {
-	if (keyCode === UP_ARROW && validIndex(mapCursor.x+map.x, mapCursor.y+map.y-1)){
+	if ((keyCode === UP_ARROW || key === 'w') && validIndex(mapCursor.x+map.x, mapCursor.y+map.y-1)){
 		moveUp();
-	} else if (keyCode === DOWN_ARROW && validIndex(mapCursor.x+map.x, mapCursor.y+map.y+1)){
+		if(keyIsDown(32)){placeTile();}
+	} else if ((keyCode === DOWN_ARROW || key === 's') && validIndex(mapCursor.x+map.x, mapCursor.y+map.y+1)){
 		moveDown();
-	} else if (keyCode === LEFT_ARROW && validIndex(mapCursor.x+map.x-1, mapCursor.y+map.y)){
+		if(keyIsDown(32)){placeTile();}
+	} else if ((keyCode === LEFT_ARROW || key === 'a') && validIndex(mapCursor.x+map.x-1, mapCursor.y+map.y)){
 		moveLeft();
-	} else if (keyCode === RIGHT_ARROW && validIndex(mapCursor.x+map.x+1, mapCursor.y+map.y)){
+		if(keyIsDown(32)){placeTile();}
+	} else if ((keyCode === RIGHT_ARROW || key === 'd') && validIndex(mapCursor.x+map.x+1, mapCursor.y+map.y)){
 		moveRight();
+		if(keyIsDown(32)){placeTile();}
 	} else if (key === 'p') {
 		pause = !pause;
-	} else if (key === 't') {
-		keyTimersTick();
+	} else if (key === ' ') {
+		placeTile();
+	} else if (key === 'q') {
+		barCursor.moveLeft();
+	} else if (key === 'e') {
+		barCursor.moveRight();
 	}
 }
 
@@ -188,9 +207,6 @@ function mouseClicked(){
 		barCursor.goTo(index.x, index.y);
 	} else if(index && index.selection == "map"){
 		mapCursor.goTo(index.x, index.y)
-		if(!mapData[index.y]){
-			mapData[index.y] = [];
-		}
-		mapData[index.y][index.x] = JSON.parse(JSON.stringify(barData[barCursor.x]));
+		placeTile();
 	}
 }
