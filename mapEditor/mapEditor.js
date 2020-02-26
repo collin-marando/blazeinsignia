@@ -1,6 +1,8 @@
 var mapCursor, map, mapData, barCursor, bar, barData;
 var pause = false; //for halting printouts
 
+var eraseMode = false;
+
 var BAR_TILE_SIZE = 50;
 var BAR_BASE_X = 0;
 var BAR_BASE_Y = 0;
@@ -52,6 +54,16 @@ function validIndex(x, y){
 	return x >= 0 && x < map.width && y >= 0 && y < map.height;
 }
 
+function removeTile(x, y){
+	if(!x && !y){
+		x = mapCursor.x;
+		y = mapCursor.y;
+	}
+	if(mapData[y]){
+		delete mapData[y][x];
+	}
+}
+
 function placeTile(x, y){
 	if(!x && !y){
 		x = mapCursor.x;
@@ -70,8 +82,13 @@ function drawMapCursor(xPos, yPos){
 	strokeWeight(2);
 	var left = xPos*MAP_TILE_SIZE+MAP_BASE_X;
 	var top = yPos*MAP_TILE_SIZE+MAP_BASE_Y; 
-	line(left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.75);
-	line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.5, left+MAP_TILE_SIZE*0.75, top+MAP_TILE_SIZE*0.5);
+	if(eraseMode){
+		line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.75);
+		line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.75, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.25);
+	} else {
+		line(left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.75);
+		line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.5, left+MAP_TILE_SIZE*0.75, top+MAP_TILE_SIZE*0.5);
+	}
 }
 
 function drawBarCursor(xPos, yPos){
@@ -176,11 +193,13 @@ function keyPressed() {
 	} else if (key === 'p') {
 		pause = !pause;
 	} else if (key === ' ') {
-		placeTile();
+		eraseMode ? removeTile() : placeTile();
 	} else if (key === 'q') {
 		barCursor.moveLeft();
 	} else if (key === 'e') {
 		barCursor.moveRight();
+	} else if (key === 'r') {
+		eraseMode = !eraseMode;
 	}
 }
 
@@ -206,7 +225,7 @@ function mouseClicked(){
 	if(index && index.selection == "bar" && index.x < barData.length){
 		barCursor.goTo(index.x, index.y);
 	} else if(index && index.selection == "map"){
-		mapCursor.goTo(index.x, index.y)
-		placeTile();
+		mapCursor.goTo(index.x, index.y);
+		eraseMode ? removeTile() : placeTile();
 	}
 }
