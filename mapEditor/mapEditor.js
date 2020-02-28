@@ -180,16 +180,16 @@ function moveRight(){
 function keyPressed() {
 	if ((keyCode === UP_ARROW || key === 'w') && validIndex(mapCursor.x+map.x, mapCursor.y+map.y-1)){
 		moveUp();
-		if(keyIsDown(32)){placeTile();}
+		if(keyIsDown(32)){eraseMode ? removeTile() : placeTile();}
 	} else if ((keyCode === DOWN_ARROW || key === 's') && validIndex(mapCursor.x+map.x, mapCursor.y+map.y+1)){
 		moveDown();
-		if(keyIsDown(32)){placeTile();}
+		if(keyIsDown(32)){eraseMode ? removeTile() : placeTile();}
 	} else if ((keyCode === LEFT_ARROW || key === 'a') && validIndex(mapCursor.x+map.x-1, mapCursor.y+map.y)){
 		moveLeft();
-		if(keyIsDown(32)){placeTile();}
+		if(keyIsDown(32)){eraseMode ? removeTile() : placeTile();}
 	} else if ((keyCode === RIGHT_ARROW || key === 'd') && validIndex(mapCursor.x+map.x+1, mapCursor.y+map.y)){
 		moveRight();
-		if(keyIsDown(32)){placeTile();}
+		if(keyIsDown(32)){eraseMode ? removeTile() : placeTile();}
 	} else if (key === 'p') {
 		pause = !pause;
 	} else if (key === ' ') {
