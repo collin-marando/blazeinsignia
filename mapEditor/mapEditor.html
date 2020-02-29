@@ -12,13 +12,20 @@
   <body>
     <input id ="fileInput" type='file'/>
     <button id="saveButton">Save</button>
-    <p id="header">
-      Arrow Keys/WASD: Move Map Cursor<br>
-      Q/E: Move Toolbar Cursor<br>
-      Space: Place Tile<br>
-      R: Toggle Erase Mode<br>
-      T: Change Layer
-    </p>
+    <table id="legend" cellspacing="15">
+      <tr>
+        <td>
+          Arrow Keys/WASD: Move Map Cursor<br>
+          Space: Place Tile<br>
+          R: Toggle Erase Mode<br>
+        </td>
+        <td>
+          T: Change Layer<br>
+          Q/E: Move Toolbar Cursor<br>
+          B: Show/Hide Bounds<br>
+        </td>
+      </tr>
+    </table>
     <div id="canvas"></div>
 
     <script src="mapEditor.js"></script>

@@ -6,7 +6,9 @@ var layers = [{type: "Tile", color: "rgb(97, 161, 90)"},
 			  {type: "Bounds", color: "rgb(201, 100, 97)"},
 			  {type: "Entity", color: "rgb(75, 117, 173)"}]
 var currLayer = 0;
+
 var eraseMode = false;
+var showBounds = true;
 
 var BAR_TILE_SIZE = 50;
 var BAR_BASE_X = 0;
@@ -42,9 +44,12 @@ function draw() {
 
 		fill(64, 64, 64);
 		rect(0, BAR_BASE_Y, width, MAP_BASE_Y-BAR_BASE_Y);
-		bar.draw();
+		if(layers[currLayer].type === "Tile"){
+			bar.draw();
+			barCursor.draw();
+		}
+
 		map.draw();
-		barCursor.draw();
 		mapCursor.draw();
 	}
 }
@@ -90,6 +95,26 @@ function placeTile(x, y){
 	mapData[y][x] = JSON.parse(JSON.stringify(barData[barCursor.x]));
 }
 
+function removeBarrier(x, y){
+	if(!x && !y){
+		x = mapCursor.x;
+		y = mapCursor.y;
+	}
+	if(mapData[y] && mapData[y][x].isBarrier){
+		delete mapData[y][x].isBarrier;
+	}
+}
+
+function placeBarrier(x, y){
+	if(!x && !y){
+		x = mapCursor.x;
+		y = mapCursor.y;
+	}
+	if(mapData[y] && mapData[y][x]){
+		mapData[y][x].isBarrier = true;
+	}	
+}
+
 //---------------DRAW FUNCTIONS---------------
 
 function drawMapCursor(xPos, yPos){
@@ -121,9 +146,19 @@ function drawGrid(xPos, yPos){
 		for(var i = 0; i < mapData[j].length; i++){
 			if(!mapData[j][i]){continue;}
 			fill(mapData[j][i].color);
+			noStroke();
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
+			
+			stroke(100);
+			var left = i*MAP_TILE_SIZE+MAP_BASE_X;
+			var top = j*MAP_TILE_SIZE+MAP_BASE_Y;
+			if(showBounds && mapData[j][i].isBarrier){
+				line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.75);
+				line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.75, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.25);
+			}
 		}
 	}
+	
 	
 	//draw map lines
 	stroke(200);
@@ -234,6 +269,8 @@ function keyPressed() {
 		eraseMode = !eraseMode;
 	} else if (key === 't') {
 		toggleLayerMode();
+	} else if (key === 'b') {
+		showBounds = !showBounds;
 	}
 }
 
@@ -264,7 +301,11 @@ function mouseClicked(){
 			barCursor.goTo(index.x, index.y);
 		} else if(index.selection === "map"){
 			mapCursor.goTo(index.x, index.y);
-			eraseMode ? removeTile() : placeTile();
+			if(layers[currLayer].type === "Tile"){
+				eraseMode ? removeTile() : placeTile();
+			} else if(layers[currLayer].type === "Bounds"){
+				eraseMode ? removeBarrier() : placeBarrier();
+			}
 		} else if(index.selection === "layer"){
 			currLayer = index.x;
 		}

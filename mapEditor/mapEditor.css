@@ -2,8 +2,11 @@ body {
 	display: block;
 }
 
-#header {
-	text-align: center;
+#legend {
+	margin-top: 10px;
+	margin-bottom: 20px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #canvas {
