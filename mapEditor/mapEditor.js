@@ -229,3 +229,43 @@ function mouseClicked(){
 		eraseMode ? removeTile() : placeTile();
 	}
 }
+
+//------------------FILE I/O----------------------
+
+function readSourceFile(evt) {
+	var file = evt.target.files[0];
+	if (file) {
+		filename = file.name;
+		var r = new FileReader();
+		r.onload = function(e) {
+			mapData = JSON.parse(e.target.result);
+		}
+		r.readAsText(file);
+	} else { 
+		alert("Failed to load file");
+	}
+}
+
+function writeOutputFile() {
+	console.log("test");
+	filename = "BE_map.JSON";
+	data = JSON.stringify(mapData);
+	var file = new Blob([data], {type: "text"});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
+}
+
+document.getElementById("fileInput").addEventListener("change", readSourceFile, false);
+document.getElementById("saveButton").addEventListener("click", writeOutputFile, false);

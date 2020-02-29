@@ -6,14 +6,12 @@
      <meta http-equiv="Pragma" content="no-cache"/>
      <meta http-equiv="Expires" content="0"/>
     <title>Blaze Insignia Map Editor</title>
-	<link rel="stylesheet" type="text/css" href="mapEditor.css">
-	<script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
-    <script src="mapEditor.js"></script>
-    <script src="../cursor.js"></script>
-    <script src="../grid.js"></script>
-    <script src="../tileTypes.js"></script>
+	  <link rel="stylesheet" type="text/css" href="mapEditor.css">
+	  <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
   </head>
   <body>
+    <input id ="fileInput" type='file'/>
+    <button id="saveButton">Save</button>
     <p id="header">
       Arrow Keys/WASD: Move Map Cursor<br>
       Q/E: Move Toolbar Cursor<br>
@@ -21,5 +19,10 @@
       R: Toggle Erase Mode
     </p>
     <div id="canvas"></div>
+
+    <script src="mapEditor.js"></script>
+    <script src="../cursor.js"></script>
+    <script src="../grid.js"></script>
+    <script src="../tileTypes.js"></script>
   </body>
 </html>
