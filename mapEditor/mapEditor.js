@@ -126,17 +126,17 @@ function drawTileBar(xPos, yPos){
 	//draw bar tiles
 	for(var i = 0; i < barData.length; i++){
 		fill(barData[i].color);
-		rect((i-xPos)*BAR_TILE_SIZE, 0, BAR_TILE_SIZE, BAR_TILE_SIZE);
+		rect((i-xPos)*BAR_TILE_SIZE+BAR_BASE_X, BAR_BASE_Y, BAR_TILE_SIZE+BAR_BASE_X, BAR_TILE_SIZE+BAR_BASE_Y);
 	}
 	
 	//draw bar lines
 	stroke(100);
 	strokeWeight(1);
 	for(var x = 0; x <= bar.width; x++){
-		line((x-xPos+bar.x)*BAR_TILE_SIZE, 0, (x-xPos+bar.x)*BAR_TILE_SIZE, bar.height*BAR_TILE_SIZE);
+		line((x-xPos+bar.x)*BAR_TILE_SIZE+BAR_BASE_X, BAR_BASE_Y, (x-xPos+bar.x)*BAR_TILE_SIZE+BAR_BASE_X, bar.height*BAR_TILE_SIZE+BAR_BASE_Y);
 	}
 	for(var y = 0; y <= bar.height; y++){
-		line(0, (y-yPos+bar.y)*BAR_TILE_SIZE, bar.width*BAR_TILE_SIZE, (y-yPos+bar.y)*BAR_TILE_SIZE);
+		line(BAR_BASE_X, (y-yPos+bar.y)*BAR_TILE_SIZE+BAR_BASE_Y, bar.width*BAR_TILE_SIZE+BAR_BASE_X, (y-yPos+bar.y)*BAR_TILE_SIZE+BAR_BASE_Y);
 	}
 
 }
