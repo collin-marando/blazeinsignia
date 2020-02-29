@@ -1,21 +1,26 @@
 var mapCursor, map, mapData, barCursor, bar, barData;
 var pause = false; //for halting printouts
 
+
+var layers = [{type: "Tile", color: "rgb(97, 161, 90)"},
+			  {type: "Bounds", color: "rgb(201, 100, 97)"},
+			  {type: "Entity", color: "rgb(75, 117, 173)"}]
+var currLayer = 0;
 var eraseMode = false;
 
 var BAR_TILE_SIZE = 50;
 var BAR_BASE_X = 0;
-var BAR_BASE_Y = 0;
+var BAR_BASE_Y = 40;
 
 var MAP_TILE_SIZE = 30;
 var MAP_BASE_X = 0;
-var MAP_BASE_Y = 70;
+var MAP_BASE_Y = 120;
 
 var MOVE_TIME = 4;
 var VIEW_BORDER = 0;
 
 function setup() {
-	var canvas = createCanvas(900, 670);
+	var canvas = createCanvas(900, 710);
 	canvas.parent("canvas");
 
 	mapData = [[]];
@@ -31,11 +36,21 @@ function setup() {
 function draw() {
 	if(!pause){
 		background(155);
+		noStroke();
+
+		drawLayerBar();
+
+		fill(64, 64, 64);
+		rect(0, BAR_BASE_Y, width, MAP_BASE_Y-BAR_BASE_Y);
 		bar.draw();
 		map.draw();
 		barCursor.draw();
 		mapCursor.draw();
 	}
+}
+
+function toggleLayerMode() {
+	currLayer = (currLayer+1)%3;
 }
 
 //--------------BAR FUNCTIONS-------------
@@ -126,7 +141,7 @@ function drawTileBar(xPos, yPos){
 	//draw bar tiles
 	for(var i = 0; i < barData.length; i++){
 		fill(barData[i].color);
-		rect((i-xPos)*BAR_TILE_SIZE+BAR_BASE_X, BAR_BASE_Y, BAR_TILE_SIZE+BAR_BASE_X, BAR_TILE_SIZE+BAR_BASE_Y);
+		rect((i-xPos)*BAR_TILE_SIZE+BAR_BASE_X, BAR_BASE_Y, BAR_TILE_SIZE, BAR_TILE_SIZE);
 	}
 	
 	//draw bar lines
@@ -139,6 +154,23 @@ function drawTileBar(xPos, yPos){
 		line(BAR_BASE_X, (y-yPos+bar.y)*BAR_TILE_SIZE+BAR_BASE_Y, bar.width*BAR_TILE_SIZE+BAR_BASE_X, (y-yPos+bar.y)*BAR_TILE_SIZE+BAR_BASE_Y);
 	}
 
+}
+
+function drawLayerBar(xPos, yPos){
+	fill(255);
+	rect(0, 0, width, 30);
+
+	textSize(18);
+	textAlign(CENTER, CENTER);
+	layers.forEach((layer, i) => {
+		fill(layer.color);
+		rect(i*150, 0, 150, 30);
+		fill(255);
+		text(layer.type+" Layer", 75+i*150, 15);
+	});
+
+	fill(layers[currLayer].color);
+	rect(0, 30, width, 10);
 }
 
 //--------------------MOVEMENT---------------------
@@ -200,6 +232,8 @@ function keyPressed() {
 		barCursor.moveRight();
 	} else if (key === 'r') {
 		eraseMode = !eraseMode;
+	} else if (key === 't') {
+		toggleLayerMode();
 	}
 }
 
@@ -215,6 +249,9 @@ function canvasCoordsToIndex(x, y){
 		x = int((x-MAP_BASE_X)/MAP_TILE_SIZE)+map.x;
 		y = int((y-MAP_BASE_Y)/MAP_TILE_SIZE)+map.y;
 		return {selection: "map", x: x, y: y};
+	} else if(x <= 450 && y <= 30) {
+		x = int(x/150);
+		return {selection: "layer", x: x, y: 0};
 	}
 	return undefined;
 }
@@ -222,11 +259,15 @@ function canvasCoordsToIndex(x, y){
 function mouseClicked(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	console.log(index)
-	if(index && index.selection == "bar" && index.x < barData.length){
-		barCursor.goTo(index.x, index.y);
-	} else if(index && index.selection == "map"){
-		mapCursor.goTo(index.x, index.y);
-		eraseMode ? removeTile() : placeTile();
+	if(index){
+		if(index.selection === "bar" && index.x < barData.length){
+			barCursor.goTo(index.x, index.y);
+		} else if(index.selection === "map"){
+			mapCursor.goTo(index.x, index.y);
+			eraseMode ? removeTile() : placeTile();
+		} else if(index.selection === "layer"){
+			currLayer = index.x;
+		}
 	}
 }
 
