@@ -33,6 +33,8 @@ function setup() {
 
 	mapCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawMapCursor);
 	barCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawBarCursor);
+
+	textSize(18);
 }
 
 function draw() {
@@ -42,11 +44,20 @@ function draw() {
 
 		drawLayerBar();
 
+		//draw back panel
 		fill(64, 64, 64);
 		rect(0, BAR_BASE_Y, width, MAP_BASE_Y-BAR_BASE_Y);
+		
+		//draw tile bar and descriptor text
 		if(layers[currLayer].type === "Tile"){
 			bar.draw();
 			barCursor.draw();
+
+			fill(255);
+			noStroke();
+			textAlign(LEFT, CENTER);
+			var obj = barData[barCursor.x];
+			text(obj.name + ": cost - " + obj.cost + ", type - " + obj.type , 10, 105);
 		}
 
 		map.draw();
@@ -72,6 +83,14 @@ function createBarAssets(){
 
 function validIndex(x, y){
 	return x >= 0 && x < map.width && y >= 0 && y < map.height;
+}
+
+function mapAction(){
+	if(layers[currLayer].type === "Tile"){
+		eraseMode ? removeTile() : placeTile();
+	} else if(layers[currLayer].type === "Bounds"){
+		eraseMode ? removeBarrier() : placeBarrier();
+	}
 }
 
 function removeTile(x, y){
@@ -153,12 +172,13 @@ function drawGrid(xPos, yPos){
 			var left = i*MAP_TILE_SIZE+MAP_BASE_X;
 			var top = j*MAP_TILE_SIZE+MAP_BASE_Y;
 			if(showBounds && mapData[j][i].isBarrier){
+				fill(255, 33, 33);
+				rect(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, MAP_TILE_SIZE*0.5, MAP_TILE_SIZE*0.5)
 				line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.75);
 				line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.75, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.25);
 			}
 		}
 	}
-	
 	
 	//draw map lines
 	stroke(200);
@@ -195,7 +215,6 @@ function drawLayerBar(xPos, yPos){
 	fill(255);
 	rect(0, 0, width, 30);
 
-	textSize(18);
 	textAlign(CENTER, CENTER);
 	layers.forEach((layer, i) => {
 		fill(layer.color);
@@ -260,11 +279,15 @@ function keyPressed() {
 	} else if (key === 'p') {
 		pause = !pause;
 	} else if (key === ' ') {
-		eraseMode ? removeTile() : placeTile();
+		mapAction();
 	} else if (key === 'q') {
-		barCursor.moveLeft();
+		if(barCursor.x-1 >= 0){
+			barCursor.moveLeft();
+		}
 	} else if (key === 'e') {
-		barCursor.moveRight();
+		if(barCursor.x+1 < barData.length){
+			barCursor.moveRight();
+		}
 	} else if (key === 'r') {
 		eraseMode = !eraseMode;
 	} else if (key === 't') {
@@ -286,6 +309,7 @@ function canvasCoordsToIndex(x, y){
 		x = int((x-MAP_BASE_X)/MAP_TILE_SIZE)+map.x;
 		y = int((y-MAP_BASE_Y)/MAP_TILE_SIZE)+map.y;
 		return {selection: "map", x: x, y: y};
+
 	} else if(x <= 450 && y <= 30) {
 		x = int(x/150);
 		return {selection: "layer", x: x, y: 0};
@@ -301,11 +325,7 @@ function mouseClicked(){
 			barCursor.goTo(index.x, index.y);
 		} else if(index.selection === "map"){
 			mapCursor.goTo(index.x, index.y);
-			if(layers[currLayer].type === "Tile"){
-				eraseMode ? removeTile() : placeTile();
-			} else if(layers[currLayer].type === "Bounds"){
-				eraseMode ? removeBarrier() : placeBarrier();
-			}
+			mapAction();
 		} else if(index.selection === "layer"){
 			currLayer = index.x;
 		}
