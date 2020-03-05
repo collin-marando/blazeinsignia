@@ -327,6 +327,12 @@ function mouseReleased(){
 		y1 = min(mapCursor.y, index.y);
 		y2 = max(mapCursor.y, index.y);
 		console.log("Range: (" + x1 + ", " + y1 + ") to (" + x2 + ", " + y2 + ")");
+
+		for(let i = x1; i <= x2; i++){
+			for(let j = y1; j <= y2; j++){
+				//mapAction(i, j);
+			}
+		}
 	}
 }
 
