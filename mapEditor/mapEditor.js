@@ -9,6 +9,7 @@ var currLayer = 0;
 
 var eraseMode = false;
 var showBounds = true;
+var multiSelect = true;
 
 var BAR_TILE_SIZE = 50;
 var BAR_BASE_X = 0;
@@ -315,7 +316,10 @@ function mousePressed(){
 function mouseDragged(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	if(index && index.selection === "map"){
-		console.log(index);
+		strokeWeight(4);
+		stroke(100);
+		noFill();
+		rect(cursor.x*MAP_TILE_SIZE+MAP_BASE_X, cursor.y*MAP_TILE_SIZE+MAP_BASE_Y,(abs(cursor.x-index.x)+1)*MAP_TILE_SIZE, (abs(cursor.y-index.y)+1)*MAP_TILE_SIZE);
 	}
 }
 
