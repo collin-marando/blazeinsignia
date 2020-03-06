@@ -19,7 +19,7 @@ var tileTypes = {
 	},
 	"stone_wall": {
 		name: "Stone Wall",
-		color: "rgb(146, 150, 150)",
+		color: "rgb(130, 130, 130)",
 		cost: 1,
 		type: "wall"
 	}
