@@ -1,17 +1,14 @@
+
+//VARIABLES
 var mapCursor, map, mapData, barCursor, bar, barData;
 var dragCursor;
+
+//FLAGS
 var pause = false; //for halting printouts
-
-
-var layers = [{type: "Tile", color: "rgb(97, 161, 90)"},
-			  {type: "Bounds", color: "rgb(201, 100, 97)"},
-			  {type: "Entity", color: "rgb(75, 117, 173)"}]
-var currLayer = 0;
-
 var eraseMode = false;
 var showBounds = true;
-var multiSelect = true;
 
+//CONSTANTS
 var BAR_TILE_SIZE = 50;
 var BAR_BASE_X = 0;
 var BAR_BASE_Y = 40;
@@ -23,18 +20,29 @@ var MAP_BASE_Y = 120;
 var MOVE_TIME = 4;
 var VIEW_BORDER = 0;
 
+//LAYERS
+var layers = [{type: "Tile", color: "rgb(97, 161, 90)"},
+			  {type: "Bounds", color: "rgb(201, 100, 97)"},
+			  {type: "Entity", color: "rgb(75, 117, 173)"}]
+var currLayer = 0;
+
+//HISTORY
+var mapHistory = []; //Initialize with empty 2D array @ 0
+var currHistory = 0;
+
 function setup() {
 	var canvas = createCanvas(900, 710);
 	canvas.parent("canvas");
 
 	mapData = [[]];
+	mapHistory.push([[]]);
 	barData = createBarAssets();
 
 	map = new Grid({x: 0, y: 0}, 30, 20, MOVE_TIME, drawGrid);
 	bar = new Grid({x: 0, y: 0}, 18, 1, MOVE_TIME, drawTileBar);
 
 	mapCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawMapCursor);
-	barCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawBarCursor);
+	barCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawTileBarCursor);
 	dragCursor = {x: 0, y: 0};
 
 	textSize(18);
@@ -86,6 +94,26 @@ function createBarAssets(){
 
 function validIndex(x, y){
 	return x >= 0 && x < map.width && y >= 0 && y < map.height;
+}
+
+function undo(){
+	if(currHistory > 0){
+		currHistory--;
+		mapData = JSON.parse(JSON.stringify(mapHistory[currHistory]));
+	}
+}
+
+function redo(){
+	if(currHistory < mapHistory.length-1){
+		currHistory++;
+		mapData = JSON.parse(JSON.stringify(mapHistory[currHistory]));
+	}
+}
+
+function archive(){
+	currHistory++;
+	mapHistory.length = currHistory; //Overwrite succeding history
+	mapHistory.push(JSON.parse(JSON.stringify(mapData)));
 }
 
 function mapAction(x, y){
@@ -153,7 +181,7 @@ function drawMapCursor(xPos, yPos){
 		 (abs(dragCursor.y-mapCursor.y)+1)*MAP_TILE_SIZE);
 }
 
-function drawBarCursor(xPos, yPos){
+function drawTileBarCursor(xPos, yPos){
 	stroke(100);
 	strokeWeight(2);
 	var left = xPos*BAR_TILE_SIZE+BAR_BASE_X;
@@ -302,6 +330,10 @@ function keyPressed() {
 		toggleLayerMode();
 	} else if (key === 'b') {
 		showBounds = !showBounds;
+	} else if (key === 'z') {
+		undo();
+	} else if (key === 'y') {
+		redo();
 	}
 }
 
@@ -357,6 +389,11 @@ function mouseReleased(){
 		}
 		mapCursor.x = dragCursor.x;
 		mapCursor.y = dragCursor.y;
+		
+		//if map has changed, add change to history
+		if(JSON.stringify(mapData) !== JSON.stringify(mapHistory[currHistory])){
+			archive();
+		}
 	}
 }
 
