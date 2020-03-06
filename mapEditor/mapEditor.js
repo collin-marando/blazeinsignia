@@ -144,8 +144,8 @@ function placeBarrier(x, y){
 //---------------DRAW FUNCTIONS---------------
 
 function drawMapCursor(xPos, yPos){
+	eraseMode?stroke(255, 33, 33):stroke(100);
 	strokeWeight(4);
-	eraseMode?stroke(255,0,0):stroke(100);
 	noFill();
 	rect(min(mapCursor.x, dragCursor.x)*MAP_TILE_SIZE+MAP_BASE_X, 
 		 min(mapCursor.y, dragCursor.y)*MAP_TILE_SIZE+MAP_BASE_Y, 
@@ -171,11 +171,12 @@ function drawGrid(xPos, yPos){
 			noStroke();
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
 			
-			stroke(100);
-			var left = i*MAP_TILE_SIZE+MAP_BASE_X;
-			var top = j*MAP_TILE_SIZE+MAP_BASE_Y;
 			if(showBounds && mapData[j][i].isBarrier){
+				stroke(100);
+				strokeWeight(2);
 				fill(255, 33, 33);
+				var left = i*MAP_TILE_SIZE+MAP_BASE_X;
+				var top = j*MAP_TILE_SIZE+MAP_BASE_Y;
 				rect(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, MAP_TILE_SIZE*0.5, MAP_TILE_SIZE*0.5)
 				line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.75);
 				line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.75, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.25);
@@ -377,7 +378,7 @@ function readSourceFile(evt) {
 
 function writeOutputFile() {
 	console.log("test");
-	filename = "BE_map.JSON";
+	filename = "BI_map.JSON";
 	data = JSON.stringify(mapData);
 	var file = new Blob([data], {type: "text"});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
