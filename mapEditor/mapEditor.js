@@ -317,7 +317,7 @@ function canvasCoordsToIndex(x, y){
 	return undefined;
 }
 
-function mouseClicked(){
+function mousePressed(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	console.log(index)
 	if(index){
@@ -328,6 +328,30 @@ function mouseClicked(){
 			mapAction();
 		} else if(index.selection === "layer"){
 			currLayer = index.x;
+		}
+	}
+}
+
+function mouseDragged(){
+	var index = canvasCoordsToIndex(mouseX, mouseY);
+	if(index && index.selection === "map"){
+		console.log(index);
+	}
+}
+
+function mouseReleased(){
+	var index = canvasCoordsToIndex(mouseX, mouseY);
+	if(index && index.selection === "map"){
+		x1 = min(mapCursor.x, index.x);
+		x2 = max(mapCursor.x, index.x);
+		y1 = min(mapCursor.y, index.y);
+		y2 = max(mapCursor.y, index.y);
+		console.log("Range: (" + x1 + ", " + y1 + ") to (" + x2 + ", " + y2 + ")");
+
+		for(let i = x1; i <= x2; i++){
+			for(let j = y1; j <= y2; j++){
+				//mapAction(i, j);
+			}
 		}
 	}
 }
