@@ -1,4 +1,5 @@
 var mapCursor, map, mapData, barCursor, bar, barData;
+var dragCursor;
 var pause = false; //for halting printouts
 
 
@@ -34,6 +35,7 @@ function setup() {
 
 	mapCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawMapCursor);
 	barCursor = new Cursor({x: 0, y: 0}, MOVE_TIME, drawBarCursor);
+	dragCursor = {x: 0, y: 0};
 
 	textSize(18);
 }
@@ -67,10 +69,10 @@ function draw() {
 }
 
 function toggleLayerMode() {
-	currLayer = (currLayer+1)%3;
+	currLayer = (currLayer+1)%layers.length;
 }
 
-//--------------BAR FUNCTIONS-------------
+//--------------TILE BAR FUNCTIONS-------------
 
 function createBarAssets(){
 	var data = [];
@@ -86,11 +88,15 @@ function validIndex(x, y){
 	return x >= 0 && x < map.width && y >= 0 && y < map.height;
 }
 
-function mapAction(){
+function mapAction(x, y){
+	if(!x && !y){
+		x = mapCursor.x;
+		y = mapCursor.y;
+	}
 	if(layers[currLayer].type === "Tile"){
-		eraseMode ? removeTile() : placeTile();
+		eraseMode ? removeTile(x, y) : placeTile(x, y);
 	} else if(layers[currLayer].type === "Bounds"){
-		eraseMode ? removeBarrier() : placeBarrier();
+		eraseMode ? removeBarrier(x, y) : placeBarrier(x, y);
 	}
 }
 
@@ -120,7 +126,7 @@ function removeBarrier(x, y){
 		x = mapCursor.x;
 		y = mapCursor.y;
 	}
-	if(mapData[y] && mapData[y][x].isBarrier){
+	if(mapData[y] && mapData[y][x] && typeof(mapData.isBarrier) !== undefined){
 		delete mapData[y][x].isBarrier;
 	}
 }
@@ -138,17 +144,13 @@ function placeBarrier(x, y){
 //---------------DRAW FUNCTIONS---------------
 
 function drawMapCursor(xPos, yPos){
-	stroke(100);
-	strokeWeight(2);
-	var left = xPos*MAP_TILE_SIZE+MAP_BASE_X;
-	var top = yPos*MAP_TILE_SIZE+MAP_BASE_Y; 
-	if(eraseMode){
-		line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.75);
-		line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.75, left+MAP_TILE_SIZE*0.75,  top+MAP_TILE_SIZE*0.25);
-	} else {
-		line(left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.75);
-		line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.5, left+MAP_TILE_SIZE*0.75, top+MAP_TILE_SIZE*0.5);
-	}
+	strokeWeight(4);
+	eraseMode?stroke(255,0,0):stroke(100);
+	noFill();
+	rect(min(mapCursor.x, dragCursor.x)*MAP_TILE_SIZE+MAP_BASE_X, 
+		 min(mapCursor.y, dragCursor.y)*MAP_TILE_SIZE+MAP_BASE_Y, 
+		 (abs(dragCursor.x-mapCursor.x)+1)*MAP_TILE_SIZE, 
+		 (abs(dragCursor.y-mapCursor.y)+1)*MAP_TILE_SIZE);
 }
 
 function drawBarCursor(xPos, yPos){
@@ -228,13 +230,14 @@ function drawLayerBar(xPos, yPos){
 	rect(0, 30, width, 10);
 }
 
-//--------------------MOVEMENT---------------------
+//--------------------MAP CURSOR MOVEMENT---------------------
 
 function moveUp(){
 	if(mapCursor.y === VIEW_BORDER){
 		map.moveDown();
 	} else {
 		mapCursor.moveUp();
+		dragCursor = {x: mapCursor.x, y: mapCursor.y};
 	}
 }
 
@@ -243,6 +246,7 @@ function moveDown(){
 		map.moveUp();
 	} else {
 		mapCursor.moveDown();
+		dragCursor = {x: mapCursor.x, y: mapCursor.y};
 	}
 }
 
@@ -251,6 +255,7 @@ function moveLeft(){
 		map.moveRight()
 	} else {
 		mapCursor.moveLeft();
+		dragCursor = {x: mapCursor.x, y: mapCursor.y};
 	}
 }
 
@@ -259,6 +264,7 @@ function moveRight(){
 		map.moveLeft()
 	} else {
 		mapCursor.moveRight();
+		dragCursor = {x: mapCursor.x, y: mapCursor.y};
 	}
 }
 
@@ -326,7 +332,7 @@ function mousePressed(){
 			barCursor.goTo(index.x, index.y);
 		} else if(index.selection === "map"){
 			mapCursor.goTo(index.x, index.y);
-			mapAction();
+			dragCursor = {x: index.x, y: index.y};
 		} else if(index.selection === "layer"){
 			currLayer = index.x;
 		}
@@ -336,27 +342,20 @@ function mousePressed(){
 function mouseDragged(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	if(index && index.selection === "map"){
-		strokeWeight(4);
-		stroke(100);
-		noFill();
-		rect(cursor.x*MAP_TILE_SIZE+MAP_BASE_X, cursor.y*MAP_TILE_SIZE+MAP_BASE_Y,(abs(cursor.x-index.x)+1)*MAP_TILE_SIZE, (abs(cursor.y-index.y)+1)*MAP_TILE_SIZE);
+		dragCursor = {x: index.x, y: index.y};
 	}
 }
 
 function mouseReleased(){
 	var index = canvasCoordsToIndex(mouseX, mouseY);
 	if(index && index.selection === "map"){
-		x1 = min(mapCursor.x, index.x);
-		x2 = max(mapCursor.x, index.x);
-		y1 = min(mapCursor.y, index.y);
-		y2 = max(mapCursor.y, index.y);
-		console.log("Range: (" + x1 + ", " + y1 + ") to (" + x2 + ", " + y2 + ")");
-
-		for(let i = x1; i <= x2; i++){
-			for(let j = y1; j <= y2; j++){
-				//mapAction(i, j);
+		for(let i = min(mapCursor.x, dragCursor.x); i <= max(mapCursor.x, dragCursor.x); i++){
+			for(let j = min(mapCursor.y, dragCursor.y); j <= max(mapCursor.y, dragCursor.y); j++){
+				mapAction(i, j);
 			}
 		}
+		mapCursor.x = dragCursor.x;
+		mapCursor.y = dragCursor.y;
 	}
 }
 
