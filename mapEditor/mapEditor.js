@@ -1,7 +1,9 @@
 
 //VARIABLES
-var mapCursor, map, mapData, barCursor, bar, barData;
+var map, mapCursor, mapData
+var bar, barCursor, barData;
 var dragCursor;
+var startPoint;
 
 //FLAGS
 var pause = false; //for halting printouts
@@ -211,6 +213,11 @@ function drawGrid(xPos, yPos){
 			}
 		}
 	}
+
+	if(startPoint){
+		fill(50, 168, 82);
+		circle(startPoint.x*MAP_TILE_SIZE+MAP_BASE_X+MAP_TILE_SIZE*0.5, startPoint.y*MAP_TILE_SIZE+MAP_BASE_Y+MAP_TILE_SIZE*0.5, MAP_TILE_SIZE*0.8);
+	}
 	
 	//draw map lines
 	stroke(200);
@@ -334,6 +341,12 @@ function keyPressed() {
 		undo();
 	} else if (key === 'y') {
 		redo();
+	} else if (key === 'c') {
+		var index = canvasCoordsToIndex(mouseX, mouseY);
+		console.log(index);
+		if(index && index.selection === "map"){
+			startPoint = {x: index.x, y: index.y};
+		}
 	}
 }
 
@@ -416,7 +429,7 @@ function readSourceFile(evt) {
 function writeOutputFile() {
 	console.log("test");
 	filename = "BI_map.JSON";
-	data = JSON.stringify(mapData);
+	data = JSON.stringify({startPoint: startPoint, mapData: mapData});
 	var file = new Blob([data], {type: "text"});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
