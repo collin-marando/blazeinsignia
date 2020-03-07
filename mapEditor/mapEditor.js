@@ -156,7 +156,7 @@ function removeBarrier(x, y){
 		x = mapCursor.x;
 		y = mapCursor.y;
 	}
-	if(mapData[y] && mapData[y][x] && typeof(mapData.isBarrier) !== undefined){
+	if(mapData[y] && mapData[y][x] && typeof mapData[y][x].isBarrier !== "undefined"){
 		delete mapData[y][x].isBarrier;
 	}
 }
@@ -429,7 +429,7 @@ function readSourceFile(evt) {
 function writeOutputFile() {
 	console.log("test");
 	filename = "BI_map.JSON";
-	data = JSON.stringify({startPoint: startPoint, mapData: mapData});
+	data = JSON.stringify({cursorStart: startPoint, mapData: mapData});
 	var file = new Blob([data], {type: "text"});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
