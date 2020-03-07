@@ -4,20 +4,23 @@ var coverOuter = true;
 
 var MAP_TILE_SIZE = 50;
 var MAP_BASE_X = 100;
-var MAP_BASE_Y = 125;
+var MAP_BASE_Y = 75;
 var MOVE_TIME = 4;
 var HOLD_TIME = 12;
-var VIEW_BORDER = 1;
+var VIEW_BORDER = 2;
 
 function setup() {
 	var canvas = createCanvas(700, 500);
 	canvas.parent("canvas");
 
-	mapData = testMap.mapData;
+	mapData = cosmeticMap.mapData;
+
+	var gridStart = {x: 1, y: 10};
+	var cursorStart = {x: cosmeticMap.startPoint.x-gridStart.x, y: cosmeticMap.startPoint.y-gridStart.y};
 
 	//Once a viewport size has been decided, add code to map editor for gridStart
-	grid = new Grid({x: 1, y: 1}, 10, 5, MOVE_TIME, drawGrid);
-	cursor = new Cursor(testMap.cursorStart, MOVE_TIME, drawCursor);
+	grid = new Grid(gridStcart, 10, 7, MOVE_TIME, drawGrid);
+	cursor = new Cursor(cursorStart, MOVE_TIME, drawCursor);
 }
 
 function draw() {
@@ -28,6 +31,7 @@ function draw() {
 
 		fill(50);
 		if(coverOuter){
+			noStroke();
 			rect(0, 0, width, MAP_BASE_Y);
 			rect(0, 0, MAP_BASE_X, height);
 			rect(MAP_BASE_X+grid.width*MAP_TILE_SIZE, 0, width, height);
@@ -109,9 +113,13 @@ function moveRight(){
 //---------------DRAW FUNCTIONS---------------
 
 function drawCursor(xPos, yPos){
-	fill(0, 255, 0, 128);
-	noStroke();
-	rect(xPos*MAP_TILE_SIZE+MAP_BASE_X, yPos*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE, MAP_TILE_SIZE/4);
+	noFill()
+	stroke(100);
+	strokeWeight(2);
+	var left = xPos*MAP_TILE_SIZE+MAP_BASE_X;
+	var top = yPos*MAP_TILE_SIZE+MAP_BASE_Y;
+	line(left+MAP_TILE_SIZE*0.25, top+MAP_TILE_SIZE*0.5, left+MAP_TILE_SIZE*0.75, top+MAP_TILE_SIZE*0.5);
+	line(left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.25, left+MAP_TILE_SIZE*0.5, top+MAP_TILE_SIZE*0.75);
 }
 
 function drawGrid(xPos, yPos){
@@ -121,6 +129,17 @@ function drawGrid(xPos, yPos){
 		for(var i = 0; i < mapData[j].length; i++){
 			if(!mapData[j][i]){continue;}
 			fill(mapData[j][i].color);
+			stroke(100);
+			strokeWeight(1);
+			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
+		}
+	}
+
+	for(var j = 0; j < mapData.length; j++){
+		if(!mapData[j]){continue;}
+		for(var i = 0; i < mapData[j].length; i++){
+			if(!mapData[j][i] || typeof mapData[j][i].isBarrier !== "undefined"){continue;}
+			noFill();
 			stroke(100);
 			strokeWeight(3);
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
