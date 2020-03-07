@@ -19,7 +19,7 @@ function setup() {
 	var cursorStart = {x: cosmeticMap.startPoint.x-gridStart.x, y: cosmeticMap.startPoint.y-gridStart.y};
 
 	//Once a viewport size has been decided, add code to map editor for gridStart
-	grid = new Grid(gridStcart, 10, 7, MOVE_TIME, drawGrid);
+	grid = new Grid(gridStart, 10, 7, MOVE_TIME, drawGrid);
 	cursor = new Cursor(cursorStart, MOVE_TIME, drawCursor);
 }
 
