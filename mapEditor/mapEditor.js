@@ -429,7 +429,7 @@ function readSourceFile(evt) {
 function writeOutputFile() {
 	console.log("test");
 	filename = "BI_map.JSON";
-	data = JSON.stringify({cursorStart: startPoint, mapData: mapData});
+	data = JSON.stringify({startPoint: startPoint, mapData: mapData});
 	var file = new Blob([data], {type: "text"});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
