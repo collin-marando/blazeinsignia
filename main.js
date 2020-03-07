@@ -1,11 +1,10 @@
-//Find another name for cursor if you're going to use the p5 cursor function to make a fuckin sweet flame sword cursor hell yeah dude
-var cursor, grid, data;
+var cursor, grid;
 var pause = false; //for halting printouts
 var coverOuter = true;
 
-var TILE_SIZE = 50;
-var BASE_X = 100;
-var BASE_Y = 125;
+var MAP_TILE_SIZE = 50;
+var MAP_BASE_X = 100;
+var MAP_BASE_Y = 125;
 var MOVE_TIME = 4;
 var HOLD_TIME = 12;
 var VIEW_BORDER = 1;
@@ -14,20 +13,11 @@ function setup() {
 	var canvas = createCanvas(700, 500);
 	canvas.parent("canvas");
 
-	data = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0],
-			[0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-			[0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-			[0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-			[0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0],
-			[0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]];
-	data.gridStart = {x: 1, y: 1};
+	mapData = testMap.mapData;
 
-	grid = new Grid(data.gridStart, 10, 5, MOVE_TIME, drawGrid);
-
-	data.cursorStart = {x: 1, y:1};
-	cursor = new Cursor(data.cursorStart, MOVE_TIME, drawCursor);
+	//Once a viewport size has been decided, add code to map editor for gridStart
+	grid = new Grid({x: 1, y: 1}, 10, 5, MOVE_TIME, drawGrid);
+	cursor = new Cursor(testMap.cursorStart, MOVE_TIME, drawCursor);
 }
 
 function draw() {
@@ -38,10 +28,10 @@ function draw() {
 
 		fill(50);
 		if(coverOuter){
-			rect(0, 0, width, BASE_Y);
-			rect(0, 0, BASE_X, height);
-			rect(BASE_X+grid.width*TILE_SIZE, 0, width, height);
-			rect(0, BASE_Y+grid.height*TILE_SIZE, width, height);
+			rect(0, 0, width, MAP_BASE_Y);
+			rect(0, 0, MAP_BASE_X, height);
+			rect(MAP_BASE_X+grid.width*MAP_TILE_SIZE, 0, width, height);
+			rect(0, MAP_BASE_Y+grid.height*MAP_TILE_SIZE, width, height);
 			fill(255);
 		}
 
@@ -55,8 +45,8 @@ function draw() {
 //--------------MAP FUNCTIONS-------------
 
 function validIndex(x, y){
-	if(x >= 0 && x < this.data[0].length && y >= 0 && y < this.data.length){
-		return this.data[y][x] == 1;
+	if(mapData[y] && mapData[y][x]){
+		return typeof mapData[y][x].isBarrier === "undefined";
 	}
 	return false;
 }
@@ -121,26 +111,20 @@ function moveRight(){
 function drawCursor(xPos, yPos){
 	fill(0, 255, 0, 128);
 	noStroke();
-	rect(xPos*TILE_SIZE+BASE_X, yPos*TILE_SIZE+BASE_Y, TILE_SIZE, TILE_SIZE, TILE_SIZE/4);
+	rect(xPos*MAP_TILE_SIZE+MAP_BASE_X, yPos*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE, MAP_TILE_SIZE/4);
 }
 
 function drawGrid(xPos, yPos){
-	//draw grid tiles
-	for(var i = 0; i < data[0].length; i++){
-		for(var j = 0; j < data.length; j++){
-			data[j][i] ? fill(80, 133, 217) : fill(232, 67, 95);
-			rect((i-xPos)*TILE_SIZE+BASE_X, (j-yPos)*TILE_SIZE+BASE_Y, TILE_SIZE, TILE_SIZE);
+	//draw map tiles
+	for(var j = 0; j < mapData.length; j++){
+		if(!mapData[j]){continue;}
+		for(var i = 0; i < mapData[j].length; i++){
+			if(!mapData[j][i]){continue;}
+			fill(mapData[j][i].color);
+			stroke(100);
+			strokeWeight(3);
+			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
 		}
-	}
-	
-	//draw grid lines
-	stroke(200);
-	strokeWeight(1);
-	for(var x = 0; x <= grid.width; x++){
-		line((x-xPos+grid.x)*TILE_SIZE+BASE_X, BASE_Y, (x-xPos+grid.x)*TILE_SIZE+BASE_X, grid.height*TILE_SIZE+BASE_Y);
-	}
-	for(var y = 0; y <= grid.height; y++){
-		line(BASE_X, (y-yPos+grid.y)*TILE_SIZE+BASE_Y, grid.width*TILE_SIZE+BASE_X, (y-yPos+grid.y)*TILE_SIZE+BASE_Y);
 	}
 
 	//draw view and move borders for conceptual purposes
@@ -148,12 +132,12 @@ function drawGrid(xPos, yPos){
 		stroke(0);
 		strokeWeight(4);
 		noFill();
-		rect(BASE_X-2, BASE_Y-2, grid.width*TILE_SIZE+4, grid.height*TILE_SIZE+4);
+		rect(MAP_BASE_X-2, MAP_BASE_Y-2, grid.width*MAP_TILE_SIZE+4, grid.height*MAP_TILE_SIZE+4);
 
 		stroke(10, 10, 10, 100);
 		strokeWeight(4);
 		noFill();
-		rect(BASE_X+VIEW_BORDER*TILE_SIZE, BASE_Y+VIEW_BORDER*TILE_SIZE, (grid.width-VIEW_BORDER*2)*TILE_SIZE, (grid.height-VIEW_BORDER*2)*TILE_SIZE);
+		rect(MAP_BASE_X+VIEW_BORDER*MAP_TILE_SIZE, MAP_BASE_Y+VIEW_BORDER*MAP_TILE_SIZE, (grid.width-VIEW_BORDER*2)*MAP_TILE_SIZE, (grid.height-VIEW_BORDER*2)*MAP_TILE_SIZE);
 	}
 }
 
@@ -225,9 +209,9 @@ function checkHeldKeys(){
 //--------------------MOUSE INPUT---------------------
 
 function canvasCoordsToWindowIndex(x, y){
-	if(x >= BASE_X && x < BASE_X+grid.width*TILE_SIZE && y >= BASE_Y && y < BASE_Y+grid.height*TILE_SIZE){
-		x = int((x-BASE_X)/TILE_SIZE);
-		y = int((y-BASE_Y)/TILE_SIZE);
+	if(x >= MAP_BASE_X && x < MAP_BASE_X+grid.width*MAP_TILE_SIZE && y >= MAP_BASE_Y && y < MAP_BASE_Y+grid.height*MAP_TILE_SIZE){
+		x = int((x-MAP_BASE_X)/MAP_TILE_SIZE);
+		y = int((y-MAP_BASE_Y)/MAP_TILE_SIZE);
 		return {x: x, y: y};
 	}
 	return undefined;
