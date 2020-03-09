@@ -418,7 +418,7 @@ function readSourceFile(evt) {
 		filename = file.name;
 		var r = new FileReader();
 		r.onload = function(e) {
-			mapData = JSON.parse(e.target.result);
+			mapData = JSON.parse(e.target.result).mapData;
 		}
 		r.readAsText(file);
 	} else { 
