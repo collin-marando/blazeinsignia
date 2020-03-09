@@ -129,7 +129,7 @@ function drawGrid(xPos, yPos){
 		for(var i = 0; i < mapData[j].length; i++){
 			if(!mapData[j][i]){continue;}
 			fill(mapData[j][i].color);
-			stroke(100);
+			stroke(255);
 			strokeWeight(1);
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
 		}
