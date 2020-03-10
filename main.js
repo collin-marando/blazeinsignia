@@ -12,10 +12,12 @@ function setup() {
 	var canvas = createCanvas(700, 500);
 	canvas.parent("canvas");
 
-	mapData = cosmeticMap.mapData;
+	currMap = JSON.parse(JSON.stringify(pathTestMap));
 
-	var gridStart = {x: 1, y: 10};
-	var cursorStart = {x: cosmeticMap.startPoint.x-gridStart.x, y: cosmeticMap.startPoint.y-gridStart.y};
+	mapData = currMap.mapData;
+
+	var gridStart = currMap.gridStartPoint;
+	var cursorStart = {x: currMap.startPoint.x-gridStart.x, y: currMap.startPoint.y-gridStart.y};
 
 	//Once a viewport size has been decided, add code to map editor for gridStart
 	grid = new Grid(gridStart, 10, 7, MOVE_TIME, drawGrid);
@@ -74,7 +76,7 @@ function generateBlankPathData(){
 }
 
 function getCost(x, y){
-	if(x >= 0 && y >= 0 && y < mapData.length && mapData[y] && x < mapData[y].length){
+	if(x >= 0 && y >= 0 && y < mapData.length && mapData[y] && x < mapData[y].length && mapData[y][x]){
         if(!("isBarrier" in mapData[y][x])){
         	return mapData[y][x].cost;
         }
@@ -88,7 +90,7 @@ function printCost(){
 			if(mapData[j][i] && "cost" in mapData[j][i]){
 				s += mapData[j][i].cost + ", ";
 			} else {
-				s += "x, ";
+				s += "-, ";
 			}
 		}
 		console.log(s);
@@ -103,7 +105,7 @@ function printPathData(){
 			if(pathData[j][i] && "range" in pathData[j][i]){
 				s += pathData[j][i].range + ", ";
 			} else {
-				s += "x, ";
+				s += "-, ";
 			}
 		}
 		console.log(s);
@@ -195,7 +197,7 @@ function drawGrid(xPos, yPos){
 
 var holdTimer = HOLD_TIME;
 var heldKey = {x: "none", y: "none"};
-var pathDist = 4;
+var pathDist = 12;
 var pathData = [];
 function keyPressed() {
 	if (keyCode === UP_ARROW){
@@ -220,7 +222,7 @@ function keyPressed() {
 		coverOuter = !coverOuter;
 	} else if (key === 'm') {
 		generateBlankPathData();
-		getPaths(pathData, cursor.x+grid.x, cursor.y+grid.y, 6, pathDist, getCost);
+		getPaths(pathData, cursor.x+grid.x, cursor.y+grid.y, pathDist, pathDist, getCost);
 		printPathData();
 	} else if (key <= "0" && key >= "9"){
 		pathDist = parseInt(key);
