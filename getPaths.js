@@ -7,9 +7,6 @@
  * parent: parent index
  */
 function getPaths(data, x, y, range, parent, getCost){
-    if(!data[y]){
-        data[y] = [];
-    }
     if(range >= 0){
         //if cell is unvisited or if new path is better
         if(!data[y][x] || "range" in data[y][x] && range > data[y][x].range){
@@ -33,11 +30,5 @@ function getPaths(data, x, y, range, parent, getCost){
                 getPaths(data, x+1, y, range-right, {x:x, y:y}, getCost);
             }
         }
-    }
-}
-
-function testGetCost(data, x, y){
-    if(x >= 0 && y >= 0 && y < data.length && typeof data[y] !== "undefined" && x < data[y].length){
-        return 1;
     }
 }

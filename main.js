@@ -56,8 +56,6 @@ function validIndex(x, y){
 }
 
 //This function depends on where we want the cursor to land in the window
-//It may be useful to generate padding tiles instead of require them to be hard coded
-//This way, there can be sufficient padding for the cursor to be anchored anywhere
 var X_ANCHOR = 1;
 var Y_ANCHOR = 1;
 function goTo(x,y){
@@ -65,6 +63,55 @@ function goTo(x,y){
 		grid.goTo(x-X_ANCHOR,y-Y_ANCHOR);
 		cursor.goTo(X_ANCHOR, Y_ANCHOR);
 	}
+}
+
+//-------------PATH FUNCTIONS------------
+
+function generateBlankPathData(){
+	for(var j = 0; j < mapData.length; j++){
+		pathData[j] = new Array(mapData[j].length);
+		for(var i = 0; i < mapData[j].length; i++){
+
+		}
+	}
+}
+
+function getCost(x, y){
+	if(x >= 0 && y >= 0 && y < mapData.length && mapData[y] && x < mapData[y].length){
+        if(!("isBarrier" in mapData[y][x])){
+        	return mapData[y][x].cost;
+        }
+    }
+}
+
+function printCost(){
+	for(var j = 0; j < mapData.length; j++){
+		var s = "";
+		for(var i = 0; i < mapData.length; i++){
+			if(mapData[j][i] && "cost" in mapData[j][i]){
+				s += mapData[j][i].cost + ", ";
+			} else {
+				s += "x, ";
+			}
+		}
+		console.log(s);
+	}
+	console.log("\n");
+}
+
+function printPathData(){
+	for(var j = 0; j < pathData.length; j++){
+		var s = "";
+		for(var i = 0; i < pathData.length; i++){
+			if(pathData[j][i] && "range" in pathData[j][i]){
+				s += pathData[j][i].range + ", ";
+			} else {
+				s += "x, ";
+			}
+		}
+		console.log(s);
+	}
+	console.log("\n");
 }
 
 //---------------MOVE FUNCTIONS---------------
@@ -164,6 +211,8 @@ function drawGrid(xPos, yPos){
 
 var holdTimer = HOLD_TIME;
 var heldKey = {x: "none", y: "none"};
+var pathDist = 4;
+var pathData = [];
 function keyPressed() {
 	if (keyCode === UP_ARROW){
 		holdTimer = HOLD_TIME;
@@ -185,6 +234,12 @@ function keyPressed() {
 		pause = !pause;
 	} else if (key === 'c') {
 		coverOuter = !coverOuter;
+	} else if (key === 'm') {
+		generateBlankPathData();
+		getPaths(pathData, cursor.x+grid.x, cursor.y+grid.y, 6, pathDist, getCost);
+		printPathData();
+	} else if (key <= "0" && key >= "9"){
+		pathDist = parseInt(key);
 	}
 }
 
