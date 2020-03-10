@@ -18,16 +18,16 @@ function getPaths(data, x, y, range, parent, getCost){
             var right = getCost(x+1, y);
 
             if(up !== undefined){
-                getPaths(data, x, y-1, range-up, {x:x, y:y}, getCost);
+                getPaths(data, x, y-1, range-up, "down", getCost);
             }
             if(down !== undefined){
-                getPaths(data, x, y+1, range-down, {x:x, y:y}, getCost);
+                getPaths(data, x, y+1, range-down, "up", getCost);
             }
             if(left !== undefined){
-                getPaths(data, x-1, y, range-left, {x:x, y:y}, getCost);
+                getPaths(data, x-1, y, range-left, "right", getCost);
             }
             if(right !== undefined){
-                getPaths(data, x+1, y, range-right, {x:x, y:y}, getCost);
+                getPaths(data, x+1, y, range-right, "left", getCost);
             }
         }
     }
