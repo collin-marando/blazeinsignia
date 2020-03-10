@@ -1,6 +1,5 @@
 var cursor, grid;
 var pause = false; //for halting printouts
-var coverOuter = true;
 
 var MAP_TILE_SIZE = 50;
 var MAP_BASE_X = 100;
@@ -30,15 +29,13 @@ function draw() {
 		cursor.draw();
 
 		fill(50);
-		if(coverOuter){
-			noStroke();
-			rect(0, 0, width, MAP_BASE_Y);
-			rect(0, 0, MAP_BASE_X, height);
-			rect(MAP_BASE_X+grid.width*MAP_TILE_SIZE, 0, width, height);
-			rect(0, MAP_BASE_Y+grid.height*MAP_TILE_SIZE, width, height);
-			fill(255);
-		}
-
+		noStroke();
+		rect(0, 0, width, MAP_BASE_Y);
+		rect(0, 0, MAP_BASE_X, height);
+		rect(MAP_BASE_X+grid.width*MAP_TILE_SIZE, 0, width, height);
+		rect(0, MAP_BASE_Y+grid.height*MAP_TILE_SIZE, width, height);
+		
+		fill(255);
 		textSize(32);
 		text("cursor map location: " + (cursor.x + grid.x) + ", " + (cursor.y + grid.y), 10, 40);
 
@@ -191,19 +188,6 @@ function drawGrid(xPos, yPos){
 			strokeWeight(3);
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
 		}
-	}
-
-	//draw view and move borders for conceptual purposes
-	if(!coverOuter){
-		stroke(0);
-		strokeWeight(4);
-		noFill();
-		rect(MAP_BASE_X-2, MAP_BASE_Y-2, grid.width*MAP_TILE_SIZE+4, grid.height*MAP_TILE_SIZE+4);
-
-		stroke(10, 10, 10, 100);
-		strokeWeight(4);
-		noFill();
-		rect(MAP_BASE_X+VIEW_BORDER*MAP_TILE_SIZE, MAP_BASE_Y+VIEW_BORDER*MAP_TILE_SIZE, (grid.width-VIEW_BORDER*2)*MAP_TILE_SIZE, (grid.height-VIEW_BORDER*2)*MAP_TILE_SIZE);
 	}
 }
 

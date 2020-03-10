@@ -2,9 +2,9 @@
  * data: input array to be modified
  * x, y: current index
  * range: remaining movement range 
+ * parent: parent index
  * getCost: function to obtain cost of a tile - (x, y) => (cost)
  *          returns either a number, infinity, or undefined
- * parent: parent index
  */
 function getPaths(data, x, y, range, parent, getCost){
     if(range >= 0){
