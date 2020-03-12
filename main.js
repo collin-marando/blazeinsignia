@@ -30,6 +30,10 @@ function draw() {
 		grid.draw();
 		cursor.draw();
 
+		if(pathData){
+			drawPaths();
+		}
+
 		fill(50);
 		noStroke();
 		rect(0, 0, width, MAP_BASE_Y);
@@ -39,7 +43,10 @@ function draw() {
 		
 		fill(255);
 		textSize(32);
+		textAlign(LEFT, CENTER);
 		text("cursor map location: " + (cursor.x + grid.x) + ", " + (cursor.y + grid.y), 10, 40);
+		textAlign(RIGHT, CENTER);
+		text("path range: "+pathDist, width-10, 40);
 
 		checkHeldKeys();
 	}
@@ -69,9 +76,6 @@ function goTo(x,y){
 function generateBlankPathData(){
 	for(var j = 0; j < mapData.length; j++){
 		pathData[j] = new Array(mapData[j].length);
-		for(var i = 0; i < mapData[j].length; i++){
-
-		}
 	}
 }
 
@@ -193,6 +197,21 @@ function drawGrid(xPos, yPos){
 	}
 }
 
+var arrows = {up:"↑", down: "↓", left: "←", right: "→"};
+function drawPaths(){
+	fill(100);
+	noStroke();
+	textAlign(CENTER, CENTER);
+	//for each element in pathData draw arrow corresponding to parent at relevant location
+	for(var j = 0; j < pathData.length; j++){
+		if(!pathData[j]){continue;}
+		for(var i = 0; i < pathData[j].length; i++){
+			if(!pathData[j][i]){continue;}
+			text(arrows[pathData[j][i].parent],(i-grid.x)*MAP_TILE_SIZE+MAP_BASE_X+MAP_TILE_SIZE*0.5, (j-grid.y)*MAP_TILE_SIZE+MAP_BASE_Y+MAP_TILE_SIZE*0.5);
+		}
+	}
+}
+
 //--------------------KEY INPUT---------------------
 
 var holdTimer = HOLD_TIME;
@@ -224,8 +243,10 @@ function keyPressed() {
 		generateBlankPathData();
 		getPaths(pathData, cursor.x+grid.x, cursor.y+grid.y, pathDist, pathDist, getCost);
 		printPathData();
-	} else if (key <= "0" && key >= "9"){
-		pathDist = parseInt(key);
+	} else if (key === '-'){
+		if(pathDist > 0){pathDist--;}
+	} else if (key === '+'){
+		pathDist++;
 	}
 }
 
