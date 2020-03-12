@@ -30,10 +30,6 @@ function draw() {
 		grid.draw();
 		cursor.draw();
 
-		if(pathData){
-			drawPaths();
-		}
-
 		fill(50);
 		noStroke();
 		rect(0, 0, width, MAP_BASE_Y);
@@ -185,6 +181,7 @@ function drawGrid(xPos, yPos){
 		}
 	}
 
+	//draw map tile borders
 	for(var j = 0; j < mapData.length; j++){
 		if(!mapData[j]){continue;}
 		for(var i = 0; i < mapData[j].length; i++){
@@ -195,10 +192,14 @@ function drawGrid(xPos, yPos){
 			rect((i-xPos)*MAP_TILE_SIZE+MAP_BASE_X, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y, MAP_TILE_SIZE, MAP_TILE_SIZE);
 		}
 	}
+
+	if(pathData){
+		drawPaths(xPos, yPos);
+	}
 }
 
-var arrows = {up:"↑", down: "↓", left: "←", right: "→"};
-function drawPaths(){
+var arrows = {up:"↑", down: "↓", left: "←", right: "→", none: "x"};
+function drawPaths(xPos, yPos){
 	fill(100);
 	noStroke();
 	textAlign(CENTER, CENTER);
@@ -207,7 +208,7 @@ function drawPaths(){
 		if(!pathData[j]){continue;}
 		for(var i = 0; i < pathData[j].length; i++){
 			if(!pathData[j][i]){continue;}
-			text(arrows[pathData[j][i].parent],(i-grid.x)*MAP_TILE_SIZE+MAP_BASE_X+MAP_TILE_SIZE*0.5, (j-grid.y)*MAP_TILE_SIZE+MAP_BASE_Y+MAP_TILE_SIZE*0.5);
+			text(arrows[pathData[j][i].parent],(i-xPos)*MAP_TILE_SIZE+MAP_BASE_X+MAP_TILE_SIZE*0.5, (j-yPos)*MAP_TILE_SIZE+MAP_BASE_Y+MAP_TILE_SIZE*0.5);
 		}
 	}
 }
@@ -241,11 +242,11 @@ function keyPressed() {
 		coverOuter = !coverOuter;
 	} else if (key === 'm') {
 		generateBlankPathData();
-		getPaths(pathData, cursor.x+grid.x, cursor.y+grid.y, pathDist, pathDist, getCost);
+		getPaths(pathData, cursor.x+grid.x, cursor.y+grid.y, pathDist, "none", getCost);
 		printPathData();
 	} else if (key === '-'){
 		if(pathDist > 0){pathDist--;}
-	} else if (key === '+'){
+	} else if (key === '+' || key === "="){
 		pathDist++;
 	}
 }
