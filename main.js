@@ -220,19 +220,19 @@ var heldKey = {x: "none", y: "none"};
 var pathDist = 12;
 var pathData = [];
 function keyPressed() {
-	if (keyCode === UP_ARROW){
+	if (keyCode === UP_ARROW || key === "w"){
 		holdTimer = HOLD_TIME;
 		heldKey.y = "up";
 		moveUp();
-	} else if (keyCode === DOWN_ARROW){
+	} else if (keyCode === DOWN_ARROW || key === "s"){
 		holdTimer = HOLD_TIME;
 		heldKey.y = "down";
 		moveDown();
-	} else if (keyCode === LEFT_ARROW){
+	} else if (keyCode === LEFT_ARROW || key === "a"){
 		holdTimer = HOLD_TIME;
 		heldKey.x = "left";
 		moveLeft();
-	} else if (keyCode === RIGHT_ARROW){
+	} else if (keyCode === RIGHT_ARROW || key === "d"){
 		holdTimer = HOLD_TIME;
 		heldKey.x = "right";
 		moveRight();
@@ -253,17 +253,17 @@ function keyPressed() {
 
 function keyReleased(){
 	//TO DO: if opposite direction takes over, timer should be reset first
-	if (keyCode === UP_ARROW){
-		heldKey.y = keyIsDown(DOWN_ARROW)? "down": "none";
+	if (keyCode === UP_ARROW || key === "w"){
+		heldKey.y = keyIsDown(DOWN_ARROW)||keyIsDown(115)? "down": "none";
 
-	} else if (keyCode === DOWN_ARROW){
-		heldKey.y = keyIsDown(UP_ARROW)? "up": "none";
+	} else if (keyCode === DOWN_ARROW || key === "s"){
+		heldKey.y = keyIsDown(UP_ARROW)||keyIsDown(119)? "up": "none";
 
-	} else if (keyCode === LEFT_ARROW){
-		heldKey.x = keyIsDown(RIGHT_ARROW)? "right": "none";
+	} else if (keyCode === LEFT_ARROW || key === "a"){
+		heldKey.x = keyIsDown(RIGHT_ARROW)||keyIsDown(100)? "right": "none";
 
-	} else if (keyCode === RIGHT_ARROW){
-		heldKey.x = keyIsDown(LEFT_ARROW)? "left": "none";
+	} else if (keyCode === RIGHT_ARROW || key === "d"){
+		heldKey.x = keyIsDown(LEFT_ARROW)||keyIsDown(97)? "left": "none";
 	}
 }
 
